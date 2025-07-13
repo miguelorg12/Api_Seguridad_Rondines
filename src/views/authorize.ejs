@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Autorizar aplicación</title>
+</head>
+<body>
+  <% if (showLogin) { %>
+    <h2>Iniciar sesión</h2>
+    <form method="POST" action="/oauth/v1/login?next=<%= originalQuery %>">
+      <input name="email" placeholder="Correo" required />
+      <input name="password" type="password" placeholder="Contraseña" required />
+      <button type="submit">Iniciar sesión</button>
+    </form>
+    <p>¿No tienes cuenta? <a href="/oauth/v1/register?next=<%= originalQuery %>">Regístrate</a></p>
+  <% } %>
+
+  <% if (showConsent) { %>
+    <h2>Autorizar acceso a "<%= clientName %>"</h2>
+    <p>Hola <%= sessionUser.name %>, la aplicación solicita permiso para:</p>
+    <ul>
+      <% scopes.split(' ').forEach(scope => { %>
+        <li><%= scope %></li>
+      <% }) %>
+    </ul>
+
+    <form method="POST" action="/oauth/v1/authorize/decision">
+        <input type="hidden" name="client_id" value="<%= clientId %>" />
+        <input type="hidden" name="redirect_uri" value="<%= redirectUri %>" />
+        <input type="hidden" name="code_challenge" value="<%= codeChallenge %>" />
+        <input type="hidden" name="code_challenge_method" value="<%= codeChallengeMethod %>" />
+        <input type="hidden" name="state" value="<%= state %>" />
+        <button name="decision" value="approve" type="submit">Autorizar</button>
+        <button name="decision" value="deny" type="submit">Cancelar</button>
+    </form>
+
+  <% } %>
+</body>
+</html>
