@@ -2,13 +2,13 @@ import "reflect-metadata";
 import express from "express";
 import session from "express-session";
 import path from "path";
-import oauthViewRoutes from "./routes/views/oauth.route";
+
 import oauthApiRoutes from "./routes/api/oauth.route";
 
 const app = express();
-
+app.use(express.static(path.join(__dirname, "..", "public")));
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views")); 
+app.set("views", path.join(__dirname, "views"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,8 +20,7 @@ app.use(
   })
 );
 
-app.use("/oauth/v1", oauthViewRoutes);
-
+app.use("/oauth/v1", oauthApiRoutes);
 
 app.get("/", (req, res) => {
   res.json("Hello, World!");

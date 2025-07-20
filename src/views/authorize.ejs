@@ -1,9 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Autorizar Aplicación - Rondi Track</title>
+    <link rel="shortcut icon" href="/img/logo3.png" type="image/x-icon" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="https://use.typekit.net/uyj3jzg.css" />
+    <script
+      src="https://kit.fontawesome.com/eca9e52a79.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
-  <body></body>
+  <body>
+    <section class="one-section">
+      <img src="/img/logo3.png" alt="Rondi Track Logo" class="os-img" />
+      <div class="os-div authorize-div">
+        <p class="os-p">Autorización</p>
+        <p class="authorize-text">
+          La aplicación solicita permiso para acceder a tu cuenta de Rondi
+          Track.
+        </p>
+        <p class="authorize-question">¿Deseas concederle acceso?</p>
+        <form method="POST" action="/authorize/confirm" class="authorize-form">
+          <input type="hidden" name="client_id" value="<%= client_id %>" />
+          <input
+            type="hidden"
+            name="redirect_uri"
+            value="<%= redirect_uri %>"
+          />
+          <div class="authorize-buttons">
+            <button
+              type="submit"
+              name="action"
+              value="approve"
+              class="login-btn authorize-btn-approve"
+            >
+              Sí, permitir
+            </button>
+            <button
+              type="submit"
+              name="action"
+              value="deny"
+              class="login-btn authorize-btn-deny"
+            >
+              No, cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </body>
 </html>
