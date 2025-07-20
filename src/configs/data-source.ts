@@ -1,9 +1,22 @@
 import "dotenv/config";
 import { DataSource } from "typeorm";
 import { User } from "@entities/user.entity";
-import { Oauth_Acceess_Tokens } from "@entities/oauth_access_tokens.entity";
-import { Oauth_Auth_Codes } from "@entities/oauth_auth_codes.entity";
-import { Oauth_Clients } from "@entities/oauth_clients.entity";
+import { Patrol } from "@entities/patrol.entity";
+import { Branch } from "@entities/branch.entity";
+import { Company } from "@entities/company.entity";
+import { PatrolRecord } from "@entities/patrol_record.entity";
+import { PatrolAssignment } from "@interfaces/entity/patrol_assigment.entity";
+import { Checkpoint } from "@entities/checkpoint.entity";
+import { CheckpointRecord } from "@entities/checkpoint_record.entity";
+import { Incident } from "@entities/incident.entity";
+import { Plan } from "@entities/plan.entity";
+import { Shift } from "@entities/shift.entity";
+import { Role } from "@entities/role.entity";
+import { ReportLog } from "@entities/report_log.entity";
+import { OauthAuthorizationCodesEntity } from "@entities/oauth_authorization_codes.entity";
+import { OauthRefreshTokensEntity } from "@entities/oauth_refresh_tokens.entity";
+import { OauthAccessTokensEntity } from "@entities/oauth_access_tokens.entity";
+import { OauthClientsEntity } from "@entities/oauth_clients.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -12,9 +25,27 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  synchronize: false,
-  logging: true,
-  entities: [User, Oauth_Acceess_Tokens, Oauth_Auth_Codes, Oauth_Clients],
+  synchronize: process.env.TYPEORM_SYNCHRONIZE === "true",
+  logging: false,
+  entities: [
+    User,
+    Patrol,
+    Branch,
+    Company,
+    PatrolRecord,
+    PatrolAssignment,
+    Checkpoint,
+    CheckpointRecord,
+    Incident,
+    Plan,
+    Shift,
+    Role,
+    ReportLog,
+    OauthAuthorizationCodesEntity,
+    OauthRefreshTokensEntity,
+    OauthAccessTokensEntity,
+    OauthClientsEntity,
+  ],
   subscribers: [],
-    migrations: [__dirname + '/../utils/migrations/*.{ts,js}'],
+  migrations: [__dirname + "/../utils/migrations/*.{ts,js}"],
 });

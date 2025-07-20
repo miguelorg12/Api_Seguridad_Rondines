@@ -1,4 +1,5 @@
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -8,20 +9,21 @@ import {
 } from "typeorm";
 import { User } from "@entities/user.entity";
 import { OauthClientsEntity } from "@entities/oauth_clients.entity";
+import { randomBytes } from "crypto";
 
-@Entity("oauth_access_tokens")
-export class OauthAccessTokensEntity {
+@Entity("oauth_authorization_codes")
+export class OauthAuthorizationCodesEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true })
-  access_token: string;
+  code: string;
 
-  @ManyToOne(() => User, (user) => user.accessTokens)
+  @ManyToOne(() => User, (user) => user.oauthAuthorizationCodes)
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @ManyToOne(() => OauthClientsEntity, (client) => client.accessTokens)
+  @ManyToOne(() => OauthClientsEntity, (client) => client.authorizationCodes)
   @JoinColumn({ name: "client_id" })
   client: OauthClientsEntity;
 
@@ -33,4 +35,9 @@ export class OauthAccessTokensEntity {
 
   @CreateDateColumn({ type: "timestamptz" })
   created_at: Date;
+
+  @BeforeInsert()
+  generateCode() {
+    this.code = randomBytes(32).toString("hex");
+  }
 }

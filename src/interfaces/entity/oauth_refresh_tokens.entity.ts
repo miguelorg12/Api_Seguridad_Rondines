@@ -1,27 +1,27 @@
 import {
+  Entity,
   Column,
   CreateDateColumn,
-  Entity,
-  JoinColumn,
   ManyToOne,
+  JoinColumn,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { User } from "@entities/user.entity";
 import { OauthClientsEntity } from "@entities/oauth_clients.entity";
 
-@Entity("oauth_access_tokens")
-export class OauthAccessTokensEntity {
+@Entity("oauth_refresh_tokens")
+export class OauthRefreshTokensEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true })
-  access_token: string;
+  refresh_token: string;
 
-  @ManyToOne(() => User, (user) => user.accessTokens)
+  @ManyToOne(() => User, (user) => user.refreshTokens)
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @ManyToOne(() => OauthClientsEntity, (client) => client.accessTokens)
+  @ManyToOne(() => OauthClientsEntity, (client) => client.refreshTokens)
   @JoinColumn({ name: "client_id" })
   client: OauthClientsEntity;
 
