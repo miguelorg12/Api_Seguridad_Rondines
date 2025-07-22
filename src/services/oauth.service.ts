@@ -86,12 +86,12 @@ export class OauthService {
       where: { email },
     });
     if (!user) {
-      throw new Error("Credenciales invalidas");
+      return null;
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new Error("Credenciales invalidas");
+      return null;
     }
     return user;
   }
