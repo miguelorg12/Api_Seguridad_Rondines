@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node -r tsconfig-paths/register src/server.ts",
+    "dev": "nodemon --watch src --ext ts --exec ts-node -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "typeorm": "ts-node -r tsconfig-paths/register --transpile-only ./node_modules/typeorm/cli.js -d src/configs/data-source.ts",
@@ -49,6 +49,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.0.13",
     "@types/oauth2-server": "^3.0.18",
+    "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3"

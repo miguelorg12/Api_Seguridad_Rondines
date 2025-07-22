@@ -5,5 +5,5 @@ import * as OauthController from "@controllers/oauth.controller";
 
 const router = Router();
 router.get("/authorize", oauthQueryValidator, OauthController.getAuthorize);
-router.post("/login", loginValidator, OauthController.postLogin);
+router.post("/login", loginValidator, OauthController.login);
 export default router;

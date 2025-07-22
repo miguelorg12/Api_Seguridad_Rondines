@@ -17,14 +17,6 @@
       <img src="/img/logo3.png" alt="" class="os-img" />
       <div class="os-div">
         <p class="os-p">Login</p>
-        <% if (typeof error !== "undefined" && error) { %>
-        <div
-          class="error-message"
-          style="color: red; text-align: center; margin-bottom: 1rem"
-        >
-          <%= error %>
-        </div>
-        <% } %>
         <form action="/oauth/v1/login" method="POST" id="login" class="login">
           <div class="input-container">
             <input

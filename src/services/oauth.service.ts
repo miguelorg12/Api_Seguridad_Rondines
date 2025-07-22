@@ -8,7 +8,6 @@ import { OauthAccessTokensEntity } from "@interfaces/entity/oauth_access_tokens.
 import { OauthAuthorizationCodesEntity } from "@interfaces/entity/oauth_authorization_codes.entity";
 import { OauthRefreshTokensEntity } from "@interfaces/entity/oauth_refresh_tokens.entity";
 import { Repository } from "typeorm";
-import { response } from "express";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -55,7 +54,12 @@ export class OauthService {
     return client;
   }
 
-  async generateAuthorizationCode(user_id: number, client_id: string) {
+  async generateAuthorizationCode(
+    user_id: number,
+    client_id: string,
+    code_challenge: string,
+    code_challenge_method: string
+  ) {
     const expires_at = new Date(Date.now() + 5 * 60 * 1000);
 
     const user = await this.userRepository.findOne({ where: { id: user_id } });
@@ -70,6 +74,8 @@ export class OauthService {
       client,
       user,
       expires_at,
+      code_challenge,
+      code_challenge_method,
     });
     const saved = await this.authorizationCodeRepository.save(authCode);
     return saved.code;

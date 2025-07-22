@@ -5,7 +5,6 @@ import { AppDataSource } from "@configs/data-source";
 import { User } from "@interfaces/entity/user.entity";
 
 const oauthService = new OauthService();
-const userRepository = AppDataSource.getRepository(User);
 
 export const getAuthorize = async (req: Request, res: Response) => {
   const {
@@ -17,6 +16,7 @@ export const getAuthorize = async (req: Request, res: Response) => {
   } = req.query;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log("Validation errors:", errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
   await oauthService.validateAuthorizationRequest(
@@ -27,59 +27,64 @@ export const getAuthorize = async (req: Request, res: Response) => {
     code_challenge_method as string
   );
   if (!req.session.user) {
-    req.session.oauthParams = { client_id, redirect_uri, response_type };
+    req.session.oauthParams = {
+      client_id,
+      redirect_uri,
+      response_type,
+      code_challenge,
+      code_challenge_method,
+    };
     return res.render("login", {
       client_id,
       redirect_uri,
       response_type,
-      error: null,
+      code_challenge,
+      code_challenge_method,
     });
   }
 
   res.render("authorize", {
     client_id,
     redirect_uri,
-    user: req.session.user || null,
+    response_type,
+    code_challenge,
+    code_challenge_method,
   });
 };
 
-export const postLogin = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).render("login", {
-      error: errors.array()[0]?.msg || "Error en los datos",
-      client_id: req.body.client_id,
-      redirect_uri: req.body.redirect_uri,
-      response_type: req.body.response_type,
-    });
+    console.log("Validation errors:", errors.array());
+    return res.status(422).json({ errors: errors.array() });
   }
-  try {
-    const user = await oauthService.loginUser(email, password);
-    if (!user) {
-      return res.status(401).render("login", {
-        error: "Credenciales invalidas",
-        client_id: req.body.client_id,
-        redirect_uri: req.body.redirect_uri,
-        response_type: req.body.response_type,
-      });
-    }
-    req.session.user = user;
-    if (req.session.oauthParams) {
-      const { client_id, redirect_uri, response_type } =
-        req.session.oauthParams;
-      delete req.session.oauthParams;
-      return res.redirect(
-        `/oauth/v1/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=${response_type}`
-      );
-    }
-    return res.status(200).json({ message: "Login successful", user });
-  } catch (error: any) {
-    return res.status(401).render("login", {
-      error: "Credenciales invalidas",
-      client_id: req.body.client_id,
-      redirect_uri: req.body.redirect_uri,
-      response_type: req.body.response_type,
-    });
+  const user = await oauthService.loginUser(email, password);
+  if (!user) {
+    return res.status(401).json({ error: "Credenciales incorrectas" });
   }
+  req.session.user = user;
+  const {
+    client_id,
+    redirect_uri,
+    response_type,
+    code_challenge,
+    code_challenge_method,
+  } = req.session.oauthParams || {};
+  if (
+    !client_id ||
+    !redirect_uri ||
+    response_type !== "code" ||
+    !code_challenge ||
+    !code_challenge_method
+  ) {
+    return res.status(400).json({ error: "Invalid authorization request" });
+  }
+  res.render("authorize", {
+    client_id,
+    redirect_uri,
+    response_type,
+    code_challenge,
+    code_challenge_method,
+  });
 };
