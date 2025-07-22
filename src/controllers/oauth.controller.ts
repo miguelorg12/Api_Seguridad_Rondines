@@ -8,7 +8,13 @@ const oauthService = new OauthService();
 const userRepository = AppDataSource.getRepository(User);
 
 export const getAuthorize = async (req: Request, res: Response) => {
-  const { client_id, redirect_uri, response_type } = req.query;
+  const {
+    client_id,
+    redirect_uri,
+    response_type,
+    code_challenge,
+    code_challenge_method,
+  } = req.query;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -16,7 +22,9 @@ export const getAuthorize = async (req: Request, res: Response) => {
   await oauthService.validateAuthorizationRequest(
     client_id as string,
     redirect_uri as string,
-    response_type as string
+    response_type as string,
+    code_challenge as string,
+    code_challenge_method as string
   );
   if (!req.session.user) {
     req.session.oauthParams = { client_id, redirect_uri, response_type };

@@ -28,10 +28,17 @@ export class OauthService {
   async validateAuthorizationRequest(
     client_id: string,
     redirect_uri: string,
-    response_type: string
+    response_type: string,
+    code_challenge: string,
+    code_challenge_method: string
   ) {
     if (response_type !== "code") {
       throw new Error("Invalid response type");
+    }
+    if (code_challenge && !code_challenge_method) {
+      throw new Error(
+        "Code challenge method is required when code challenge is provided"
+      );
     }
 
     const client = await this.clientRepository.findOne({

@@ -1,5 +1,6 @@
 import { AppDataSource } from "@configs/data-source";
 import { OauthClientsEntity } from "@interfaces/entity/oauth_clients.entity";
+import { isIn } from "class-validator";
 import { param, query, body } from "express-validator";
 
 export const oauthQueryValidator = [
@@ -43,6 +44,16 @@ export const oauthQueryValidator = [
       }
       return true;
     }),
+  query("code_challenge")
+    .notEmpty()
+    .withMessage("El campo code_challenge es obligatorio")
+    .isString()
+    .withMessage("El code_challenge debe ser una cadena de texto"),
+  query("code_challenge_method")
+    .notEmpty()
+    .withMessage("El campo code_challenge_method es obligatorio")
+    .isIn(["S256"])
+    .withMessage("El code_challenge_method debe ser 'S256'"),
 ];
 
 export const loginValidator = [
