@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { AppDataSource } from "@configs/data-source";
-import { randomBytes } from "crypto";
+import { randomBytes, createHash } from "crypto";
 import { User } from "@interfaces/entity/user.entity";
 import { OauthClientsEntity } from "@interfaces/entity/oauth_clients.entity";
 import { OauthAccessTokensEntity } from "@interfaces/entity/oauth_access_tokens.entity";
@@ -94,5 +94,67 @@ export class OauthService {
       return null;
     }
     return user;
+  }
+
+  async generateAccessToken(
+    grant_type: string,
+    code: string,
+    redirect_uri: string,
+    client_id: string,
+    code_verifier: string
+  ) {
+    if (grant_type !== "code") {
+      throw new Error("Invalid grant type");
+    }
+
+    const authCode = await this.authorizationCodeRepository.findOne({
+      where: { code },
+      relations: ["user", "client"],
+    });
+
+    if (!authCode) {
+      throw new Error("Authorization code not found");
+    }
+
+    if (authCode.expires_at < new Date()) {
+      throw new Error("Authorization code expired");
+    }
+
+    if (authCode.client.client_id !== client_id) {
+      throw new Error("Client ID mismatch");
+    }
+
+    if (authCode.client.redirect_uri !== redirect_uri) {
+      throw new Error("Redirect URI mismatch");
+    }
+
+    if (authCode.code_challenge_method === "S256" && !code_verifier) {
+      throw new Error("Code verifier is required for S256 method");
+    }
+    let isCodeValid = true;
+    if (authCode.code_challenge_method === "S256") {
+      const hash = createHash("sha256")
+        .update(code_verifier)
+        .digest("base64url");
+      isCodeValid = hash === authCode.code_challenge;
+    }
+    if (!isCodeValid) {
+      throw new Error("Invalid code verifier");
+    }
+    if (!JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined in environment variables");
+    }
+    const payload = {
+      sub: authCode.user.id,
+      client_id: authCode.client.client_id,
+    };
+    const expiresIn = 3600; // 1 hour
+    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn });
+
+    return {
+      accessToken,
+      tojenType: "Bearer",
+      expires_in: expiresIn,
+    };
   }
 }

@@ -11,13 +11,37 @@
       src="https://kit.fontawesome.com/eca9e52a79.js"
       crossorigin="anonymous"
     ></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script type="module" src="/scripts/login.js"></script>
+    <style>
+      .error-message {
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        width: 100%;
+        color: red;
+        font-size: 0.8em;
+        text-align: center;
+      }
+      .input-container {
+        position: relative; /* Es importante para que el error se posicione relativo a su input */
+        margin-bottom: 25px; /* Ajusta este margen para dar espacio al error debajo del input */
+      }
+      .unauthorized-error {
+        color: red;
+        font-size: 0.8em;
+        text-align: center;
+        margin-bottom: 10px; /* Espacio entre el error y el formulario */
+      }
+    </style>
   </head>
   <body>
     <section class="one-section">
       <img src="/img/logo3.png" alt="" class="os-img" />
       <div class="os-div">
         <p class="os-p">Login</p>
-        <form action="/oauth/v1/login" method="POST" id="login" class="login">
+        <div id="unauthorized-error" class="unauthorized-error"></div>
+        <form method="POST" id="login" class="login">
           <div class="input-container">
             <input
               type="email"
@@ -27,6 +51,7 @@
               required
             />
             <i class="fas fa-user input-icon"></i>
+            <div id="email-error" class="error-message"></div>
           </div>
           <div class="input-container">
             <input
@@ -37,7 +62,9 @@
               required
             />
             <i class="fas fa-key input-icon"></i>
+            <div id="password-error" class="error-message"></div>
           </div>
+
           <button type="submit" class="login-btn">Login</button>
         </form>
       </div>

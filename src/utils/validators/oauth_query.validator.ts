@@ -64,3 +64,55 @@ export const loginValidator = [
     .withMessage("El email debe ser válido"),
   body("password").notEmpty().withMessage("El campo password es obligatorio"),
 ];
+
+export const tokenValidator = [
+  body("grant_type")
+    .notEmpty()
+    .withMessage("El campo grant_type es obligatorio")
+    .isIn(["code", "token"])
+    .withMessage("El grant_type debe ser 'code' o 'token'"),
+  body("code")
+    .notEmpty()
+    .withMessage("El campo code es obligatorio")
+    .isString()
+    .withMessage("El code debe ser una cadena de texto"),
+  body("redirect_uri")
+    .notEmpty()
+    .withMessage("El campo redirect_uri es obligatorio")
+    .isString()
+    .withMessage("El redirect_uri debe ser una cadena de texto"),
+  body("client_id")
+    .notEmpty()
+    .withMessage("El campo client_id es obligatorio")
+    .isString()
+    .withMessage("El client_id debe ser una cadena de texto"),
+  body("code_verifier")
+    .notEmpty()
+    .withMessage("El campo code_verifier es obligatorio")
+    .isString()
+    .withMessage("El code_verifier debe ser una cadena de texto"),
+];
+
+export const authorizeConfirmValidator = [
+  query("client_id")
+    .notEmpty()
+    .withMessage("El campo client_id es obligatorio")
+    .isString()
+    .withMessage("El client_id debe ser una cadena de texto"),
+  query("redirect_uri")
+    .notEmpty()
+    .withMessage("El campo redirect_uri es obligatorio")
+    .isString()
+    .withMessage("El redirect_uri debe ser una cadena de texto"),
+  query("response_type")
+    .notEmpty()
+    .withMessage("El campo response_type es obligatorio")
+    .isIn(["code", "token"])
+    .withMessage("El response_type debe ser 'code' o 'token'"),
+  query("code_challenge")
+    .isString()
+    .withMessage("El code_challenge debe ser una cadena de texto"),
+  query("code_challenge_method")
+    .isIn(["S256"])
+    .withMessage("El code_challenge_method debe ser 'S256'"),
+];

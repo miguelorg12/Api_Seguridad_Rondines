@@ -2,10 +2,17 @@ import "reflect-metadata";
 import express from "express";
 import session from "express-session";
 import path from "path";
+import cors from "cors";
 
 import oauthApiRoutes from "./routes/api/oauth.route";
 
 const app = express();
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 app.use(express.static(path.join(__dirname, "..", "public")));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
