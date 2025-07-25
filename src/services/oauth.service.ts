@@ -7,6 +7,7 @@ import { OauthClientsEntity } from "@interfaces/entity/oauth_clients.entity";
 import { OauthAccessTokensEntity } from "@interfaces/entity/oauth_access_tokens.entity";
 import { OauthAuthorizationCodesEntity } from "@interfaces/entity/oauth_authorization_codes.entity";
 import { OauthRefreshTokensEntity } from "@interfaces/entity/oauth_refresh_tokens.entity";
+import { Code } from "@interfaces/entity/code.entity";
 import { Repository } from "typeorm";
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -15,6 +16,7 @@ export class OauthService {
   private userRepository: Repository<User>;
   private clientRepository: Repository<OauthClientsEntity>;
   private authorizationCodeRepository: Repository<OauthAuthorizationCodesEntity>;
+  private codeRepository: Repository<Code>;
 
   constructor() {
     this.userRepository = AppDataSource.getRepository(User);
@@ -22,6 +24,7 @@ export class OauthService {
     this.authorizationCodeRepository = AppDataSource.getRepository(
       OauthAuthorizationCodesEntity
     );
+    this.codeRepository = AppDataSource.getRepository(Code);
   }
 
   async validateAuthorizationRequest(
@@ -156,5 +159,48 @@ export class OauthService {
       tojenType: "Bearer",
       expires_in: expiresIn,
     };
+  }
+  async generateCodeTwoFactor(user_id: number) {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const user = await this.userRepository.findOne({ where: { id: user_id } });
+    if (!user) throw new Error("User not found");
+
+    const codeEntity = this.codeRepository.create({
+      user,
+      code,
+    });
+    await this.codeRepository.save(codeEntity);
+
+    return code;
+  }
+
+  async verifyTwoFactorCode(user_id: number, code: string) {
+    const codeEntity = await this.codeRepository.findOne({
+      where: { user: { id: user_id } },
+      order: { created_at: "DESC" },
+    });
+    console.log("Verifying 2FA code for user ID:", user_id);
+    console.log("Code to verify:", code);
+    console.log("Code entity found:", codeEntity);
+    if (!codeEntity) {
+      return false;
+    }
+
+    const now = new Date();
+    if (codeEntity.expirates_at < now) {
+      return false;
+    }
+
+    const isCodeCorrect = await bcrypt.compare(code, codeEntity.code);
+    if (!isCodeCorrect) {
+      return false;
+    }
+    console.log("Código introducido:", code);
+    console.log("Código expiración válido:", isCodeCorrect);
+    // Optionally, delete the code after successful verification
+    await this.codeRepository.remove(codeEntity);
+
+    return true;
   }
 }

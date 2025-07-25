@@ -3,12 +3,19 @@ import {
   authorizeConfirmValidator,
   oauthQueryValidator,
   tokenValidator,
+  twoFactorCodeValidator,
 } from "@validators/oauth_query.validator";
 import { loginValidator } from "@utils/validators/oauth_query.validator";
 import * as OauthController from "@controllers/oauth.controller";
 
 const router = Router();
 router.get("/authorize", oauthQueryValidator, OauthController.getAuthorize);
+router.get("/2fa", OauthController.getTwoFactor);
+router.post(
+  "/2fa/confirm",
+  twoFactorCodeValidator,
+  OauthController.verifyTwoFactorCode
+);
 router.post(
   "/authorize/confirm",
   authorizeConfirmValidator,

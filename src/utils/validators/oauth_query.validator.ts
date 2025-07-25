@@ -116,3 +116,11 @@ export const authorizeConfirmValidator = [
     .isIn(["S256"])
     .withMessage("El code_challenge_method debe ser 'S256'"),
 ];
+
+export const twoFactorCodeValidator = [
+  body("code")
+    .notEmpty()
+    .withMessage("El campo code es obligatorio")
+    .isString()
+    .withMessage("El code debe ser una cadena de texto"),
+];

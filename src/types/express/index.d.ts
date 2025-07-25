@@ -12,5 +12,9 @@ declare module "express-session" {
       code_challenge?: any;
       code_challenge_method?: any;
     };
+    is2faPending?: {
+      userId: number;
+      email: string;
+    };
   }
 }

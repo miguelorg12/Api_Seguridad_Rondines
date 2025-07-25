@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Rondi Track</title>
+    <link rel="shortcut icon" href="/img/logo3.png" type="image/x-icon" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="https://use.typekit.net/uyj3jzg.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script type="module" src="/scripts/twofactor.js"></script>
+    <script
+      src="https://kit.fontawesome.com/eca9e52a79.js"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      .error-message {
+        color: red;
+        font-size: 0.9em;
+        text-align: center;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="two-section">
+      <div class="ts-div">
+        <p class="ts-p">Autenticación en dos pasos</p>
+        <p class="ts-p2">
+          Para proteger tu acceso, te hemos enviado un código de 6 dígitos a tu
+          correo electrónico. Introdúcelo a continuación.
+        </p>
+        <div class="ts-div2">
+          <div class="ts-div3">
+            <input class="ts-input" type="text" />
+          </div>
+          <div class="ts-div3">
+            <input class="ts-input" type="text" />
+          </div>
+          <div class="ts-div3">
+            <input class="ts-input" type="text" />
+          </div>
+          <div class="ts-div3">
+            <input class="ts-input" type="text" />
+          </div>
+          <div class="ts-div3">
+            <input class="ts-input" type="text" />
+          </div>
+          <div class="ts-div3">
+            <input class="ts-input" type="text" />
+          </div>
+        </div>
+        <p class="ts-p3">¿No has recibido el código?</p>
+        <p class="ts-p4">Reenviar código en <span>00:59</span></p>
+        <button type="submit" class="ts-btn">Verificar</button>
+        <div id="code-error" class="error-message"></div>
+        <div id="unauthorized-error" class="error-message"></div>
+        <p class="ts-p5">*No compartas este código con nadie.*</p>
+      </div>
+    </section>
+  </body>
+</html>

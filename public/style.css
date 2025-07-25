@@ -1,357 +1,473 @@
 body {
-  font-family: "barlow-condensed", sans-serif !important;
-  font-style: normal;
-  padding: 0;
-  margin: 0;
+    font-family: "barlow-condensed", sans-serif !important;
+    font-style: normal;
+    padding: 0;
+    margin: 0;
 }
 
 /* Estilos básicos para el formulario */
 .one-section {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  min-height: 100vh;
-  background: #e5e5e5e5;
-  overflow: hidden;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #e5e5e5e5;
+    overflow: hidden;
 }
 
 .os-div {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 30px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 415px;
-  height: 288px;
-  max-height: 288px;
-  border-bottom: 3px solid #1e2a38;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 30px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 415px;
+    height: 288px;
+    max-height: 288px;
+    border-bottom: 3px solid #1e2a38;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .os-p {
-  text-align: center;
-  font-size: 40px;
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  font-weight: bold;
-  color: #333;
-  letter-spacing: -2px;
+    text-align: center;
+    font-size: 40px;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    letter-spacing: -2px;
 }
 
 .os-img {
-  width: 180px;
-  margin-bottom: 40px;
+    width: 180px;
+    margin-bottom: 40px;
 }
 
 .login {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 /* Contenedor para input con icono */
 .input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
 /* Estilos para los inputs */
 .input-container input {
-  width: 100%;
-  padding: 12px 40px 12px 16px;
-  border: none;
-  border-radius: 0;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-  background: #eaeaea;
+    width: 100%;
+    padding: 12px 40px 12px 16px;
+    border: none;
+    border-radius: 0;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+    background: #eaeaea;
 }
 
 .input-container input:focus {
-  outline: none;
-  border-color: #007bff;
+    outline: none;
+    border-color: #007bff;
 }
 
 /* Estilos para los iconos */
 .input-icon {
-  position: absolute;
-  right: 12px;
-  color: #bababa;
-  font-size: 1rem;
-  pointer-events: none;
+    position: absolute;
+    right: 12px;
+    color: #bababa;
+    font-size: 1rem;
+    pointer-events: none;
 }
 
 /* Cambio de color del icono cuando el input está en focus */
 .input-container input:focus + .input-icon {
-  color: #007bff;
+    color: #007bff;
 }
 
 /* Estilos para el botón */
 .login-btn {
-  padding: 12px;
-  background-color: #1e2a38;
-  width: 50%;
-  margin: 0 auto;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 1rem;
-  display: inline-block;
-  padding: 5px 20px;
+    padding: 12px;
+    background-color: #1e2a38;
+    width: 50%;
+    margin: 0 auto;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+    display: inline-block;
+    padding: 5px 20px;
 }
 
 .login-btn:hover {
-  background-color: #0056b3;
+    background-color: #0056b3;
 }
 
 /* Estilos responsivos */
 @media (max-width: 768px) {
-  .os-img {
-    margin-right: 0;
-    margin-bottom: 1rem;
-    width: 100px;
-  }
+    .os-img {
+        margin-right: 0;
+        margin-bottom: 1rem;
+        width: 100px;
+    }
 
-  .os-div {
-    width: 70%;
-  }
+    .os-div {
+        width: 70%;
+    }
 }
 
 /* two section */
 .two-section {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  min-height: 100vh;
-  background: #e5e5e5e5;
-  overflow: hidden;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #e5e5e5; /* Usar el color de fondo para que se vea limpio */
+    overflow: hidden;
+    padding: 20px; /* Añade un poco de padding general */
+    box-sizing: border-box; /* Incluye padding en el ancho/alto */
 }
 
 .ts-div {
-  width: 80%;
-  margin: 0 auto;
+    background: #fff;
+    padding: 3rem 2rem; /* Aumentar el padding interno */
+    border-radius: 12px; /* Bordes más suaves */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada pero suave */
+    width: 100%;
+    max-width: 500px; /* Ancho máximo para el contenedor principal */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrar todos los elementos horizontalmente */
+    text-align: center; /* Centrar el texto por defecto */
+    gap: 1.5rem; /* Espacio entre los elementos principales del contenedor */
 }
 
 .ts-p {
-  text-align: center;
-  font-size: 40px;
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-weight: bold;
-  color: #1e2a38;
-  letter-spacing: -2px;
+    font-size: 2.5rem; /* Título más grande */
+    margin-bottom: 0.5rem; /* Menos margen inferior para que esté más cerca del párrafo */
+    font-weight: 700; /* Más negrita */
+    color: #1e2a38;
+    letter-spacing: -1.5px; /* Ajuste del espaciado de letras */
 }
 
 .ts-p2 {
-  text-align: center;
-  margin-top: 0;
-  color: #333;
-  letter-spacing: -1px;
+    font-size: 1.1rem; /* Texto descriptivo más legible */
+    line-height: 1.5; /* Mejorar el interlineado */
+    color: #555; /* Un gris más suave */
+    margin-bottom: 1.5rem; /* Espacio debajo de la descripción */
+    max-width: 400px; /* Limita el ancho para que no se extienda demasiado */
 }
 
 .ts-div2 {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  width: 60%;
-  margin: 0 auto;
+    display: flex;
+    justify-content: center; /* Centra los inputs en el contenedor */
+    align-items: center;
+    gap: 0.8rem; /* Espacio entre los inputs */
+    width: 100%; /* Ocupa todo el ancho disponible del ts-div */
+    max-width: 350px; /* Limita el ancho de los inputs para que no se estiren demasiado */
+    margin-bottom: 1.5rem; /* Espacio debajo de los inputs */
 }
 
 .ts-div3 {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 10px;
-  width: 50px;
-  height: 50px;
-  border-bottom: 2px solid #1e2a38;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+    background: #f8f8f8; /* Un fondo ligeramente gris para los inputs individuales */
+    padding: 0.5rem; /* Reducir padding interno para controlar mejor el tamaño */
+    border-radius: 8px; /* Bordes un poco más suaves */
+    width: 45px; /* Tamaño fijo para cada input */
+    height: 45px; /* Tamaño fijo para cada input */
+    border: 1px solid #ddd; /* Borde sutil */
+    /* Removimos border-bottom y overflow: hidden aquí */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra interna para profundidad */
+    transition: all 0.2s ease-in-out; /* Transición suave para enfoque */
+}
+
+.ts-div3:focus-within { /* Nuevo: aplica estilos al contenedor cuando el input dentro está enfocado */
+    border-color: #007bff;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(0, 123, 255, 0.25);
+    background: #fff; /* Blanco al enfocar */
 }
 
 .ts-input {
-  width: 100%;
-  padding: 12px;
-  border-bottom: #bababa 1px solid;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-  background: transparent;
+    width: 100%;
+    height: 100%; /* Ocupa todo el ts-div3 */
+    text-align: center; /* Centra el texto del dígito */
+    font-size: 1.8rem; /* Tamaño de fuente más grande para el dígito */
+    font-weight: 600; /* Negrita para el dígito */
+    color: #333;
+    border: none; /* Quitamos todos los bordes del input */
+    background: transparent;
+    outline: none; /* Quitamos el outline predeterminado del navegador */
+    -moz-appearance: textfield; /* Para Firefox, ocultar flechas numéricas */
 }
 
-.ts-p3,
-.ts-p4 {
-  text-align: center;
-  font-size: 0.9rem;
-  color: #1e2a38;
-  letter-spacing: -1px;
+/* Ocultar flechas de incremento/decremento en inputs de tipo number */
+.ts-input::-webkit-outer-spin-button,
+.ts-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
+
 
 .ts-p3 {
-  margin-top: 1rem;
+    text-align: center; /* Centrar el texto */
+    font-size: 0.95rem; /* Tamaño de fuente un poco más grande */
+    color: #555; /* Color gris suave */
+    margin-top: 1rem;
+    margin-bottom: 0.5rem; /* Espacio entre "No has recibido?" y "Reenviar código" */
 }
 
 .ts-p4 {
-  margin-top: 0.5rem;
+    text-align: center; /* Centrar el texto */
+    font-size: 1rem; /* Tamaño de fuente más legible */
+    font-weight: 600; /* Negrita para destacar */
+    color: #1e2a38; /* Color inicial */
+    margin-top: 0; /* Asegurarse de que no haya margen extra */
+    margin-bottom: 2rem; /* Espacio antes del botón */
+    cursor: default; /* Por defecto no es clicable */
+    transition: color 0.2s ease; /* Transición para el color del texto */
 }
 
 .ts-p4 span {
-  color: #007bff;
+    color: #007bff; /* Color del tiempo */
+    font-weight: 700; /* Negrita para el tiempo */
 }
 
+.ts-p4.active-link { /* Clase que se agregará con JS cuando el tiempo termine */
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+
 .ts-btn {
-  padding: 5px 12px;
-  background-color: #1e2a38;
-  display: block;
-  margin: 0 auto;
-  color: white;
-  border: none;
-  border-radius: 3px;
+    padding: 12px 30px; /* Más padding para un botón más robusto */
+    background-color: #1e2a38;
+    color: white;
+    border: none;
+    border-radius: 6px; /* Bordes más redondeados */
+    font-size: 1.1rem; /* Texto del botón más grande */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 80%; /* Ancho fijo para el botón */
+    max-width: 250px; /* Ancho máximo para el botón */
+    margin-bottom: 1.5rem; /* Espacio antes de la nota */
+}
+
+.ts-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px); /* Efecto de elevación */
 }
 
 .ts-p5 {
-  text-align: center;
-  font-size: 0.6rem;
+    text-align: center;
+    font-size: 0.75rem; /* Un poco más grande para ser legible */
+    color: #888; /* Un gris más suave */
+    margin-top: 0;
 }
 
 @media screen and (max-width: 1100px) and (min-width: 768px) {
-  .ts-div2 {
-    width: 80%;
-  }
-
-  .ts-div3 {
-    width: 40px;
-    height: 40px;
-  }
+    .ts-div {
+        max-width: 450px; /* Ajustar el ancho del contenedor principal */
+        padding: 2.5rem 1.5rem;
+    }
+    .ts-p {
+        font-size: 2.2rem;
+    }
+    .ts-p2 {
+        font-size: 1rem;
+    }
+    .ts-div2 {
+        gap: 0.6rem;
+        max-width: 300px;
+    }
+    .ts-div3 {
+        width: 40px;
+        height: 40px;
+    }
+    .ts-input {
+        font-size: 1.6rem;
+    }
+    .ts-btn {
+        padding: 10px 25px;
+        font-size: 1rem;
+    }
 }
 
 @media screen and (max-width: 768px) {
-  .ts-p {
-    font-size: 2rem;
-  }
-
-  .ts-p2 {
-    font-size: 0.9rem;
-  }
-
-  .ts-div2 {
-    width: 100%;
-  }
-
-  .ts-div3 {
-    width: 20px;
-    height: 20px;
-    padding: 10px;
-  }
-
-  .ts-input {
-    padding: 0;
-  }
-
-  .ts-p3,
-  .ts-p4 {
-    font-size: 0.8rem;
-  }
+    .two-section {
+        padding: 15px; /* Menos padding en pantallas pequeñas */
+    }
+    .ts-div {
+        width: 95%; /* Ocupa más ancho en móviles */
+        padding: 2rem 1rem; /* Padding más pequeño */
+        gap: 1rem;
+    }
+    .ts-p {
+        font-size: 2rem;
+        margin-bottom: 0.3rem;
+    }
+    .ts-p2 {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    .ts-div2 {
+        width: 100%; /* Ocupa todo el ancho disponible */
+        flex-wrap: wrap; /* Permite que los inputs salten de línea si no caben */
+        justify-content: center; /* Centrar elementos si saltan de línea */
+        gap: 0.5rem; /* Menos espacio entre inputs en móviles */
+        margin-bottom: 1rem;
+    }
+    .ts-div3 {
+        width: 35px; /* Tamaño más pequeño para inputs en móviles */
+        height: 35px;
+        padding: 0; /* Asegurarse de que no haya padding interno excesivo */
+    }
+    .ts-input {
+        font-size: 1.4rem; /* Tamaño de fuente más pequeño para el dígito */
+    }
+    .ts-p3,
+    .ts-p4 {
+        font-size: 0.85rem;
+        margin-bottom: 0.8rem;
+    }
+    .ts-btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        width: 90%; /* Botón más ancho en móviles */
+        max-width: unset; /* Eliminar el max-width para móviles */
+        margin-bottom: 1rem;
+    }
+    .ts-p5 {
+        font-size: 0.65rem;
+    }
 }
 
 
 /* Estilos específicos para la vista de autorización */
 .authorize-div {
-  height: auto; /* Ajusta la altura automáticamente según el contenido */
-  min-height: 288px; /* Mantén una altura mínima si lo deseas */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center; /* Centra el contenido horizontalmente */
-  text-align: center; /* Centra el texto */
+    height: auto; /* Ajusta la altura automáticamente según el contenido */
+    min-height: 288px; /* Mantén una altura mínima si lo deseas */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Centra el contenido horizontalmente */
+    text-align: center; /* Centra el texto */
+    padding: 2rem; /* Aumenta el padding general para más espacio */
+    background-color: #ffffff; /* Fondo blanco para el contenedor */
+    border-radius: 8px; /* Bordes ligeramente redondeados */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave para destacar */
+    max-width: 500px; /* Limita el ancho máximo para una mejor legibilidad */
+    margin: 2rem auto; /* Centra el div en la página */
+}
+
+.authorize-div .os-p { /* Asumiendo que .os-p es un título principal */
+    font-size: 1.8rem; /* Tamaño de fuente más grande para el título */
+    color: #1e2a38; /* Color oscuro para el título */
+    margin-bottom: 1.5rem; /* Espacio debajo del título */
+    font-weight: 700; /* Negrita para el título */
 }
 
 .authorize-text {
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  color: #555;
-  line-height: 1.5;
-  padding: 0 1rem; /* Añade un poco de padding para que no se pegue a los bordes */
+    font-size: 1.05rem; /* Ligeramente más grande que 1.1rem para mejor lectura */
+    margin-bottom: 1.2rem;
+    color: #666; /* Un gris un poco más suave */
+    line-height: 1.6; /* Mayor interlineado para legibilidad */
+    padding: 0 1rem;
 }
 
 .authorize-question {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 1.5rem;
+    font-size: 1.35rem; /* Más prominente para la pregunta */
+    font-weight: 600; /* Menos negrita que 'bold' pero aún fuerte */
+    color: #333;
+    margin-bottom: 2rem; /* Más espacio antes de los botones */
 }
 
 .authorize-form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .authorize-buttons {
-  display: flex;
-  justify-content: center; /* Centra los botones */
-  gap: 1rem; /* Espacio entre los botones */
-  width: 100%; /* Ocupa todo el ancho disponible en el contenedor flex */
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem; /* Aumenta el espacio entre botones */
+    width: 100%;
+}
+
+.authorize-btn { /* Clase base para estilos comunes de botones */
+    padding: 12px 25px; /* Más padding para botones más grandes */
+    border-radius: 6px; /* Bordes ligeramente redondeados para los botones */
+    font-size: 1.05rem; /* Tamaño de fuente para los botones */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones suaves */
+    border: none; /* Elimina el borde por defecto */
+    font-weight: 600;
+    width: 48%; /* Ajusta el ancho para dejar un pequeño gap si es necesario */
 }
 
 .authorize-btn-approve {
-  background-color: #1e2a38; /* Color del botón principal */
-  width: 45%; /* Ajusta el ancho para que quepan bien */
-  padding: 10px 15px; /* Ajusta el padding para un mejor tamaño */
+    background-color: #1e2a38; /* Mantén tu color principal */
+    color: #ffffff; /* Texto blanco para contraste */
 }
 
 .authorize-btn-approve:hover {
-  background-color: #0056b3;
+    background-color: #0056b3;
+    transform: translateY(-2px); /* Efecto sutil al pasar el ratón */
 }
 
 .authorize-btn-deny {
-  background-color: #dc3545; /* Un color más distintivo para "Cancelar" */
-  width: 45%; /* Ajusta el ancho para que quepan bien */
-  padding: 10px 15px; /* Ajusta el padding para un mejor tamaño */
+    background-color: #e0e0e0; /* Un gris claro para el botón "Denegar" */
+    color: #555; /* Texto oscuro para el botón "Denegar" */
+    border: 1px solid #ccc; /* Un borde sutil */
 }
 
 .authorize-btn-deny:hover {
-  background-color: #c82333;
-}
-
-/* Ajustes para el os-p en la vista de autorización */
-.authorize-div .os-p {
-  margin-bottom: 1rem; /* Reduce el margen inferior para el título */
+    background-color: #d0d0d0;
+    transform: translateY(-2px);
 }
 
 /* Media queries para responsividad */
 @media (max-width: 768px) {
-  .authorize-buttons {
-    flex-direction: column; /* Apila los botones en pantallas pequeñas */
-    gap: 0.8rem;
-  }
+    .authorize-div {
+        padding: 1.5rem;
+        margin: 1rem auto;
+    }
 
-  .authorize-btn-approve,
-  .authorize-btn-deny {
-    width: 80%; /* Los botones ocupan más ancho */
-  }
+    .authorize-buttons {
+        flex-direction: column;
+        gap: 1rem; /* Espacio entre botones apilados */
+    }
 
-  .authorize-text {
-    font-size: 1rem;
-  }
+    .authorize-btn-approve,
+    .authorize-btn-deny {
+        width: 90%; /* Los botones ocupan más ancho en móviles */
+        padding: 10px 20px;
+    }
 
-  .authorize-question {
-    font-size: 1.1rem;
-  }
+    .authorize-div .os-p {
+        font-size: 1.5rem;
+    }
+
+    .authorize-text {
+        font-size: 0.95rem;
+    }
+
+    .authorize-question {
+        font-size: 1.15rem;
+    }
 }

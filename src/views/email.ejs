@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Código de Autenticación - Rondi Track</title>
+    <style>
+      /* Estilos generales para compatibilidad en email */
+      body {
+        font-family: "barlow-condensed", sans-serif, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333333;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      table {
+        border-collapse: collapse;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+      td {
+        padding: 0;
+      }
+      img {
+        border: 0;
+        height: auto;
+        line-height: 100%;
+        outline: none;
+        text-decoration: none;
+        -ms-interpolation-mode: bicubic;
+      }
+      a {
+        text-decoration: none;
+        color: #007bff;
+      }
+
+      /* Contenedor principal del email */
+      .email-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      /* Encabezado */
+      .header {
+        background-color: #1e2a38;
+        padding: 20px 0;
+        text-align: center;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+      .header img {
+        /* Ajustes para el tamaño del logo */
+        width: 80px; /* Establece un ancho fijo más pequeño */
+        max-width: 80px; /* Asegura que no exceda este ancho */
+        height: auto; /* Mantiene la proporción */
+        display: block; /* Asegura que se comporte como un bloque para centrar */
+        margin: 0 auto; /* Centra la imagen horizontalmente */
+      }
+
+      /* Cuerpo del contenido */
+      .content-body {
+        padding: 30px;
+        text-align: center;
+      }
+      .content-body h1 {
+        font-size: 28px;
+        color: #1e2a38;
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-weight: 700;
+        letter-spacing: -1px;
+      }
+      .content-body p {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        color: #555555;
+      }
+
+      /* Estilos para el código OTP */
+      .otp-code-container {
+        background-color: #f0f0f0;
+        border: 1px solid #dddddd;
+        border-radius: 6px;
+        padding: 15px 20px;
+        margin: 25px auto;
+        display: inline-block; /* Para que el div no ocupe todo el ancho */
+        max-width: 250px;
+      }
+      .otp-code {
+        font-size: 32px;
+        font-weight: bold;
+        color: #1e2a38;
+        letter-spacing: 5px; /* Espaciado entre dígitos */
+        display: block;
+        text-align: center;
+      }
+
+      /* Mensajes adicionales */
+      .warning-text {
+        font-size: 14px;
+        color: #888888;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      .expiration-text {
+        font-size: 14px;
+        color: #888888;
+        margin-top: 10px;
+        margin-bottom: 25px;
+      }
+      .expiration-text strong {
+        color: #d9534f; /* Color para destacar el tiempo de expiración */
+      }
+
+      /* Botón (si lo necesitas, aunque para 2FA es mejor que vuelvan a la app) */
+      .button {
+        display: inline-block;
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 12px 25px;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+
+      /* Pie de página */
+      .footer {
+        background-color: #eeeeee;
+        padding: 20px;
+        font-size: 12px;
+        color: #777777;
+        text-align: center;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+      .footer a {
+        color: #777777;
+        text-decoration: underline;
+      }
+
+      /* Responsive adjustments */
+      @media screen and (max-width: 600px) {
+        .email-container {
+          width: 100% !important;
+          margin: 0 !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+        }
+        .content-body {
+          padding: 20px !important;
+        }
+        .content-body h1 {
+          font-size: 24px !important;
+        }
+        .otp-code-container {
+          max-width: 90% !important;
+        }
+        .otp-code {
+          font-size: 28px !important;
+        }
+        .header img {
+          /* Ajuste responsivo para el logo */
+          width: 60px !important; /* Más pequeño en móvil */
+          max-width: 60px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <table
+      role="presentation"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      width="100%"
+      style="background-color: #f4f4f4"
+    >
+      <tr>
+        <td align="center" style="padding: 20px 0">
+          <table
+            role="presentation"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            width="100%"
+            class="email-container"
+          >
+            <!-- Header -->
+            <tr>
+              <td class="header">
+                <img
+                  src="cid:logoimg"
+                  alt="Rondi Track Logo"
+                  style="
+                    display: block;
+                    width: 80px;
+                    max-width: 80px;
+                    height: auto;
+                    margin: 0 auto;
+                  "
+                />
+              </td>
+            </tr>
+
+            <!-- Body Content -->
+            <tr>
+              <td class="content-body">
+                <h1>Autenticación en dos pasos</h1>
+                <p>Hola <%= userEmail %>,</p>
+                <p>
+                  Para proteger tu cuenta, hemos recibido una solicitud de
+                  inicio de sesión. Por favor, utiliza el siguiente código para
+                  verificar tu identidad:
+                </p>
+
+                <div class="otp-code-container">
+                  <span class="otp-code"><%= otpCode %></span>
+                </div>
+
+                <p class="warning-text">
+                  <strong>Importante:</strong> No compartas este código con
+                  nadie, ni siquiera con empleados de Rondi Track.
+                </p>
+
+                <p>
+                  Si no solicitaste este código, por favor ignora este correo
+                  electrónico.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td class="footer">
+                <p>&copy; Rondi Track. Todos los derechos reservados.</p>
+                <p>
+                  Este es un correo electrónico automático, por favor no
+                  respondas.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
