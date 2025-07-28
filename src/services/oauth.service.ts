@@ -169,10 +169,38 @@ export class OauthService {
       expires_at: new Date(Date.now() + expiresIn * 1000), // expiresIn = 3600 segundos = 1 hora
     });
 
+    const user = await this.userRepository.findOne({
+      where: { id: authCode.user.id },
+      relations: ["role", "branch", "branches"],
+      select: {
+        id: true,
+        name: true,
+        last_name: true,
+        curp: true,
+        email: true,
+        active: true,
+        biometric: true,
+        created_at: true,
+        updated_at: true,
+        role: {
+          id: true,
+          name: true,
+        },
+        branch: {
+          id: true,
+          name: true,
+        },
+        branches: {
+          id: true,
+          name: true,
+        },
+      },
+    });
     return {
       accessToken,
       tojenType: "Bearer",
       expires_in: expiresIn,
+      user,
     };
   }
   async generateCodeTwoFactor(user_id: number) {
