@@ -196,11 +196,19 @@ export class OauthService {
         },
       },
     });
+
+    const mappedUser = {
+      ...user,
+      ownedBraches: user?.branch, // Sucursales que administra (dueño)
+      assignedBranches: user?.branches, // Sucursales donde trabaja (guardia)
+    };
+    delete mappedUser.branch; // Remove branch if not needed
+    delete mappedUser.branches; // Remove branches if not needed
     return {
       accessToken,
       tojenType: "Bearer",
       expires_in: expiresIn,
-      user,
+      user: mappedUser,
     };
   }
   async generateCodeTwoFactor(user_id: number) {
