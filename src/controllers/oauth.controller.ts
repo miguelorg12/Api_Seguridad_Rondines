@@ -4,12 +4,13 @@ import { validationResult } from "express-validator";
 import { AppDataSource } from "@configs/data-source";
 import { User } from "@interfaces/entity/user.entity";
 import { EmailService } from "@services/email.service";
+import jwt from "jsonwebtoken";
 import ejs from "ejs";
 import path from "path";
 
 const oauthService = new OauthService();
 const emailService = new EmailService();
-
+const JWT_SECRET = process.env.JWT_SECRET;
 export const getAuthorize = async (req: Request, res: Response) => {
   const {
     client_id,
@@ -228,4 +229,79 @@ export const verifyTwoFactorCode = async (req: Request, res: Response) => {
     success: true,
     redirect: `/oauth/v1/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=${response_type}&code_challenge=${code_challenge}&code_challenge_method=${code_challenge_method}`,
   });
+};
+
+export const getMe = async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  if (!JWT_SECRET) {
+    return res.status(500).json({ error: "JWT secret is not configured" });
+  }
+  try {
+    const decode = jwt.verify(token, JWT_SECRET as string);
+    console.log("JWT decoded:", decode);
+    const user = await AppDataSource.getRepository(User).findOne({
+      where: { id: Number(decode.sub) },
+      relations: ["role", "branch", "branches"],
+      select: {
+        id: true,
+        name: true,
+        last_name: true,
+        curp: true,
+        email: true,
+        active: true,
+        role: {
+          id: true,
+          name: true,
+        },
+        branch: {
+          id: true,
+          name: true,
+          address: true,
+        },
+        branches: {
+          id: true,
+          name: true,
+          address: true,
+        },
+      },
+    });
+    return res.json({
+      success: true,
+      user: user,
+    });
+  } catch (error) {
+    console.error("JWT verification error:", error);
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+};
+
+export const refreshToken = async (req: Request, res: Response) => {
+  const { refresh_token } = req.body;
+  if (!refresh_token) {
+    return res.status(400).json({ error: "No refresh token provided" });
+  }
+  try {
+    const decoded: any = jwt.verify(refresh_token, JWT_SECRET as string);
+    const user = await AppDataSource.getRepository(User).findOneBy({
+      id: decoded.sub,
+    });
+    if (!user) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+    const accessToken = jwt.sign(
+      { sub: user.id, email: user.email },
+      JWT_SECRET as string,
+      { expiresIn: "1h" }
+    );
+    return res.json({ accessToken });
+  } catch (error) {
+    return res.status(401).json({ error: "Invalid refresh token" });
+  }
 };

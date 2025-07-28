@@ -11,6 +11,8 @@ import * as OauthController from "@controllers/oauth.controller";
 const router = Router();
 router.get("/authorize", oauthQueryValidator, OauthController.getAuthorize);
 router.get("/2fa", OauthController.getTwoFactor);
+router.get("/me", OauthController.getMe);
+router.post("/refresh", OauthController.refreshToken);
 router.post(
   "/2fa/confirm",
   twoFactorCodeValidator,

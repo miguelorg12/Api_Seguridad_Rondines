@@ -17,6 +17,8 @@ export class OauthService {
   private clientRepository: Repository<OauthClientsEntity>;
   private authorizationCodeRepository: Repository<OauthAuthorizationCodesEntity>;
   private codeRepository: Repository<Code>;
+  private refreshTokenRepository: Repository<OauthRefreshTokensEntity>;
+  private accessTokenRepository: Repository<OauthAccessTokensEntity>;
 
   constructor() {
     this.userRepository = AppDataSource.getRepository(User);
@@ -25,6 +27,12 @@ export class OauthService {
       OauthAuthorizationCodesEntity
     );
     this.codeRepository = AppDataSource.getRepository(Code);
+    this.refreshTokenRepository = AppDataSource.getRepository(
+      OauthRefreshTokensEntity
+    );
+    this.accessTokenRepository = AppDataSource.getRepository(
+      OauthAccessTokensEntity
+    );
   }
 
   async validateAuthorizationRequest(
@@ -153,6 +161,13 @@ export class OauthService {
     };
     const expiresIn = 3600; // 1 hour
     const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn });
+
+    await this.accessTokenRepository.save({
+      access_token: accessToken,
+      user: { id: authCode.user.id },
+      client: { id: authCode.client.id },
+      expires_at: new Date(Date.now() + expiresIn * 1000), // expiresIn = 3600 segundos = 1 hora
+    });
 
     return {
       accessToken,
