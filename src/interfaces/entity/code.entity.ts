@@ -3,12 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
 } from "typeorm";
-import bcrypt from "bcrypt";
-import { User } from "@interfaces/entity/user.entity";
+import * as bcrypt from "bcrypt";
+import { User } from "@entities/user.entity";
 
 @Entity()
 export class Code {
@@ -24,16 +24,16 @@ export class Code {
   @Column({ type: "timestamptz" })
   expirates_at: Date;
 
+  @ManyToOne(() => User, (user) => user.codes)
+  @JoinColumn({ name: "user_id" })
+  user: User;
+
   @BeforeInsert()
   setExpirationDate() {
     const now = new Date();
     now.setMinutes(now.getMinutes() + 10); // Set expiration to 10 minutes from now
     this.expirates_at = now;
   }
-
-  @ManyToOne(() => User, (user) => user.codes)
-  @JoinColumn({ name: "user_id" })
-  user: User;
 
   @BeforeInsert()
   async hashCode() {

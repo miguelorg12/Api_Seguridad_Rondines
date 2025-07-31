@@ -18,10 +18,11 @@ import { OauthRefreshTokensEntity } from "@entities/oauth_refresh_tokens.entity"
 import { OauthAccessTokensEntity } from "@entities/oauth_access_tokens.entity";
 import { OauthClientsEntity } from "@entities/oauth_clients.entity";
 import { Code } from "@entities/code.entity";
+import { IncidentImage } from "@interfaces/entity/incident_image.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: "localhost",
+  host: process.env.DB_HOST,
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
@@ -47,6 +48,7 @@ export const AppDataSource = new DataSource({
     OauthAccessTokensEntity,
     OauthClientsEntity,
     Code,
+    IncidentImage,
   ],
   subscribers: [],
   migrations: [__dirname + "/../utils/migrations/*.{ts,js}"],

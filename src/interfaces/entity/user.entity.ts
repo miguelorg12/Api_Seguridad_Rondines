@@ -18,7 +18,7 @@ import { Role } from "@entities/role.entity";
 import { Incident } from "@entities/incident.entity";
 import { ReportLog } from "@entities/report_log.entity";
 import { Branch } from "@entities/branch.entity";
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
 import { OauthAuthorizationCodesEntity } from "@entities/oauth_authorization_codes.entity";
 import { OauthAccessTokensEntity } from "@entities/oauth_access_tokens.entity";
 import { OauthRefreshTokensEntity } from "@entities/oauth_refresh_tokens.entity";
@@ -48,8 +48,8 @@ export class User {
   @Column({ default: true })
   active: boolean;
 
-  @Column()
-  biometric: string;
+  @Column({ nullable: true })
+  biometric: number;
 
   @OneToMany(() => Code, (code) => code.user)
   codes: Code[];
@@ -79,6 +79,9 @@ export class User {
   )
   refreshTokens: OauthRefreshTokensEntity[];
 
+  @OneToMany(() => OauthAccessTokensEntity, (accessToken) => accessToken.user)
+  accessTokens: OauthAccessTokensEntity[];
+
   @ManyToMany(() => Branch, (branch) => branch.guards)
   @JoinTable({
     name: "user_branches",
@@ -86,9 +89,6 @@ export class User {
     inverseJoinColumn: { name: "branch_id", referencedColumnName: "id" },
   })
   branches: Branch[];
-
-  @OneToMany(() => OauthAccessTokensEntity, (accessToken) => accessToken.user)
-  accessTokens: OauthAccessTokensEntity[];
 
   @CreateDateColumn({ type: "timestamptz" })
   created_at: Date;

@@ -11,7 +11,7 @@ import {
 import { OauthAuthorizationCodesEntity } from "@entities/oauth_authorization_codes.entity";
 import { OauthAccessTokensEntity } from "@entities/oauth_access_tokens.entity";
 import { OauthRefreshTokensEntity } from "@entities/oauth_refresh_tokens.entity";
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
 
 @Entity("oauth_clients")
 export class OauthClientsEntity {
