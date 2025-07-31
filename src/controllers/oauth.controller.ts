@@ -181,7 +181,7 @@ export const token = async (req: Request, res: Response) => {
     code_verifier
   );
   console.log("Access token generated:", accessToken);
-  return res.json({ accessToken });
+  return res.json(accessToken);
 };
 
 export const verifyTwoFactorCode = async (req: Request, res: Response) => {
