@@ -1,5 +1,14 @@
 import "reflect-metadata";
-import "module-alias/register";
+
+// Configurar module-alias según el entorno
+const isCompiled = __dirname.includes("dist");
+if (isCompiled) {
+  // En producción, usar la configuración compilada
+  require("./module-alias");
+} else {
+  // En desarrollo, usar la configuración normal
+  require("module-alias/register");
+}
 
 // Cargar el archivo de entorno correcto según NODE_ENV
 const envFile =
