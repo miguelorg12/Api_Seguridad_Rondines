@@ -16,7 +16,19 @@ app.use(
 
 // Configurar rutas de archivos estáticos y vistas para desarrollo y producción
 const isDevelopment = process.env.NODE_ENV !== "production";
-const baseDir = isDevelopment ? path.join(__dirname, "..") : __dirname;
+const isCompiled = __dirname.includes("dist");
+
+// Si estamos en el directorio dist (compilado), usar rutas relativas a dist
+// Si estamos en src (desarrollo), usar rutas relativas al directorio raíz
+const baseDir = isCompiled ? __dirname : path.join(__dirname, "..");
+
+// Log temporal para debug
+console.log("🔍 Debug info:");
+console.log("__dirname:", __dirname);
+console.log("isCompiled:", isCompiled);
+console.log("baseDir:", baseDir);
+console.log("views path:", path.join(baseDir, "views"));
+console.log("public path:", path.join(baseDir, "public"));
 
 app.use(express.static(path.join(baseDir, "public")));
 app.set("view engine", "ejs");
