@@ -13,9 +13,14 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.static(path.join(__dirname, "..", "public")));
+
+// Configurar rutas de archivos estáticos y vistas para desarrollo y producción
+const isDevelopment = process.env.NODE_ENV !== "production";
+const baseDir = isDevelopment ? path.join(__dirname, "..") : __dirname;
+
+app.use(express.static(path.join(baseDir, "public")));
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(baseDir, "views"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
