@@ -5,8 +5,6 @@ const sourceViewsDir = path.join(__dirname, '..', 'src', 'views');
 const targetViewsDir = path.join(__dirname, '..', 'dist', 'views');
 const sourcePublicDir = path.join(__dirname, '..', 'public');
 const targetPublicDir = path.join(__dirname, '..', 'dist', 'public');
-const sourceModuleAliasFile = path.join(__dirname, '..', 'dist', 'module-alias.js');
-const targetModuleAliasFile = path.join(__dirname, '..', 'dist', 'module-alias.js');
 
 // Función para copiar archivos recursivamente
 function copyDirectory(source, target) {
@@ -47,13 +45,6 @@ try {
   
   // Copiar archivos públicos
   copySpecificDirectory(sourcePublicDir, targetPublicDir, 'Public files');
-  
-  // Verificar que el archivo module-alias.js existe
-  if (fs.existsSync(sourceModuleAliasFile)) {
-    console.log('Module alias configuration file exists');
-  } else {
-    console.log('Module alias configuration file not found, skipping...');
-  }
   
   console.log('All static files copied successfully!');
 } catch (error) {
