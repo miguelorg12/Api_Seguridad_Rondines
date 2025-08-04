@@ -7,6 +7,10 @@ import cors from "cors";
 import oauthApiRoutes from "./routes/api/oauth.route";
 
 const app = express();
+
+// Configurar trust proxy para manejar proxies (importante para producción con HTTPS)
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: "*",
@@ -36,20 +40,38 @@ app.set("views", path.join(baseDir, "views"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Configuración de sesiones optimizada para HTTPS y producción
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "default_secret",
     resave: true,
     saveUninitialized: false,
     cookie: {
-      secure: true, // Cambiar a true en producción con HTTPS
+      secure: true, // Habilitado para HTTPS
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 horas
       sameSite: "lax",
+      path: "/",
     },
     name: "oauth_session",
+    rolling: true, // Renovar la cookie en cada request
+    unset: "destroy", // Destruir la sesión al cerrar el navegador
   })
 );
+
+// Middleware de debug para sesiones
+app.use((req, res, next) => {
+  console.log(`🔍 [Session Debug] Session ID: ${req.sessionID}`);
+  if (req.session) {
+    console.log(`🔍 [Session Debug] Session data:`, {
+      oauthParams: req.session.oauthParams ? "present" : "missing",
+      is2faPending: req.session.is2faPending ? "present" : "missing",
+      user: req.session.user ? "present" : "missing",
+    });
+  }
+  next();
+});
 
 app.use("/oauth/v1", oauthApiRoutes);
 

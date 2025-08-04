@@ -19,7 +19,8 @@
     "migrate:revert": "npm run typeorm -- migration:revert",
     "seed": "ts-node -r tsconfig-paths/register src/utils/seeds/index.ts",
     "postbuild": "echo 'Build completed successfully!'",
-    "check-config": "node scripts/check-config.js"
+    "check-config": "node scripts/check-config.js",
+    "check-session": "node scripts/check-session.js"
   },
   "repository": {
     "type": "git",
