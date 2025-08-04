@@ -19,11 +19,21 @@ export const getAuthorize = async (req: Request, res: Response) => {
     code_challenge,
     code_challenge_method,
   } = req.query;
+
+  console.log("OAuth authorization request:", {
+    client_id,
+    redirect_uri,
+    response_type,
+    code_challenge,
+    code_challenge_method,
+  });
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log("Validation errors:", errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
+
   await oauthService.validateAuthorizationRequest(
     client_id as string,
     redirect_uri as string,
@@ -31,7 +41,9 @@ export const getAuthorize = async (req: Request, res: Response) => {
     code_challenge as string,
     code_challenge_method as string
   );
+
   if (!req.session.user) {
+    // Guardar parámetros de OAuth en la sesión
     req.session.oauthParams = {
       client_id,
       redirect_uri,
@@ -39,6 +51,9 @@ export const getAuthorize = async (req: Request, res: Response) => {
       code_challenge,
       code_challenge_method,
     };
+
+    console.log("OAuth parameters saved to session:", req.session.oauthParams);
+
     return res.render("login", {
       client_id,
       redirect_uri,
@@ -77,7 +92,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(401).json({ error: "Credenciales incorrectas" });
   }
 
-  // req.session.user = user;
+  // Verificar que los parámetros de OAuth estén presentes en la sesión
   const {
     client_id,
     redirect_uri,
@@ -85,10 +100,9 @@ export const login = async (req: Request, res: Response) => {
     code_challenge,
     code_challenge_method,
   } = req.session.oauthParams || {};
-  req.session.is2faPending = {
-    userId: user.id,
-    email: user.email,
-  };
+
+  console.log("OAuth parameters in session:", req.session.oauthParams);
+
   if (
     !client_id ||
     !redirect_uri ||
@@ -96,8 +110,21 @@ export const login = async (req: Request, res: Response) => {
     !code_challenge ||
     !code_challenge_method
   ) {
-    return res.status(400).json({ error: "Invalid authorization request" });
+    console.error(
+      "Missing OAuth parameters in session:",
+      req.session.oauthParams
+    );
+    return res.status(400).json({
+      error:
+        "Parámetros de autorización faltantes. Por favor, inicie el proceso de autorización nuevamente.",
+    });
   }
+
+  // Guardar información de 2FA en la sesión
+  req.session.is2faPending = {
+    userId: user.id,
+    email: user.email,
+  };
 
   const code = await oauthService.generateCodeTwoFactor(user.id);
 
@@ -119,9 +146,19 @@ export const login = async (req: Request, res: Response) => {
   }
 
   console.log("User logged in:", user);
+
+  // Construir URL de redirección con parámetros de OAuth
+  const oauthParams = new URLSearchParams({
+    client_id: client_id as string,
+    redirect_uri: redirect_uri as string,
+    response_type: response_type as string,
+    code_challenge: code_challenge as string,
+    code_challenge_method: code_challenge_method as string,
+  });
+
   res.json({
     success: true,
-    redirect: `/oauth/v1/2fa?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=${response_type}&code_challenge=${code_challenge}&code_challenge_method=${code_challenge_method}`,
+    redirect: `/oauth/v1/2fa?${oauthParams.toString()}`,
   });
 };
 
@@ -197,6 +234,8 @@ export const verifyTwoFactorCode = async (req: Request, res: Response) => {
     code_challenge,
     code_challenge_method,
   } = req.session.oauthParams || {};
+
+  // Verificar si los parámetros de OAuth están presentes
   if (
     !client_id ||
     !redirect_uri ||
@@ -204,14 +243,21 @@ export const verifyTwoFactorCode = async (req: Request, res: Response) => {
     !code_challenge ||
     !code_challenge_method
   ) {
-    return res.redirect(
-      `/oauth/v1/login?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=${response_type}&code_challenge=${code_challenge}&code_challenge_method=${code_challenge_method}`
+    console.error(
+      "OAuth parameters missing in session:",
+      req.session.oauthParams
     );
+    return res.status(400).json({
+      error:
+        "Parámetros de autorización faltantes. Por favor, inicie el proceso de autorización nuevamente.",
+    });
   }
   if (!req.session.is2faPending) {
-    return res.redirect(
-      `/oauth/v1/login?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=${response_type}&code_challenge=${code_challenge}&code_challenge_method=${code_challenge_method}`
-    );
+    console.error("2FA session missing:", req.session);
+    return res.status(400).json({
+      error:
+        "Sesión de autenticación faltante. Por favor, inicie el proceso de autorización nuevamente.",
+    });
   }
   const { userId, email } = req.session.is2faPending;
   const isValid = await oauthService.verifyTwoFactorCode(userId, code);
@@ -225,9 +271,19 @@ export const verifyTwoFactorCode = async (req: Request, res: Response) => {
   delete req.session.is2faPending;
 
   console.log("2FA verified for user:", email);
+
+  // Asegurar que los parámetros de OAuth estén disponibles para la siguiente redirección
+  const oauthParams = new URLSearchParams({
+    client_id: client_id as string,
+    redirect_uri: redirect_uri as string,
+    response_type: response_type as string,
+    code_challenge: code_challenge as string,
+    code_challenge_method: code_challenge_method as string,
+  });
+
   return res.json({
     success: true,
-    redirect: `/oauth/v1/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=${response_type}&code_challenge=${code_challenge}&code_challenge_method=${code_challenge_method}`,
+    redirect: `/oauth/v1/authorize?${oauthParams.toString()}`,
   });
 };
 
