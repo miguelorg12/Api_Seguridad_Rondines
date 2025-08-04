@@ -93,4 +93,47 @@ app.get("/", (req, res) => {
   res.json("Hello, World!");
 });
 
+// Middleware de manejo de errores global
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error("❌ [Global Error] Unhandled error:", err);
+    console.error("❌ [Global Error] Error stack:", err.stack);
+    console.error("❌ [Global Error] Request path:", req.path);
+    console.error("❌ [Global Error] Request method:", req.method);
+    console.error("❌ [Global Error] Session ID:", req.sessionID);
+
+    // Si es un error de base de datos
+    if (err.code === "ECONNREFUSED" || err.code === "ENOTFOUND") {
+      return res.status(500).json({
+        error: "Error de conexión a la base de datos",
+        details:
+          process.env.NODE_ENV === "development" ? err.message : undefined,
+      });
+    }
+
+    // Si es un error de validación
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        error: "Error de validación",
+        details:
+          process.env.NODE_ENV === "development" ? err.message : undefined,
+      });
+    }
+
+    // Error genérico
+    res.status(500).json({
+      error: "Error interno del servidor",
+      details:
+        process.env.NODE_ENV === "development"
+          ? err.message
+          : "Something went wrong",
+    });
+  }
+);
+
 export default app;

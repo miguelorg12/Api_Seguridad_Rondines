@@ -14,6 +14,7 @@ export async function fetchData(url, data) {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // CRÍTICO: incluir cookies en las peticiones
       body: JSON.stringify(data),
     });
     let json;

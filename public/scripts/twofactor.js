@@ -140,28 +140,69 @@ $(document).ready(function () {
     if (code.length === $inputs.length && /^\d+$/.test(code)) {
       console.log("Código introducido:", code);
       const data = { code };
-      const response = await fetchData("/oauth/v1/2fa/confirm", data);
-      console.log("Response status:", response.status);
-      if (response.status === 422) {
-        response.body.errors.forEach((error) => {
-          if (error.path === "code") {
-            $("#code-error").text(error.msg);
-          }
-        });
-        setTimeout(() => {
-          $("#code-error").text("");
-        }, 2000);
-      }
-      if (response.status === 200) {
-        console.log("Código verificado, redirigiendo...");
-        window.location.href = response.body.redirect;
-      }
-      if (response.status === 401) {
-        console.log("Error de autorización:", response.body.error);
-        $("#unauthorized-error").text(response.body.error);
+      
+      try {
+        const response = await fetchData("/oauth/v1/2fa/confirm", data);
+        console.log("Response status:", response.status);
+        
+        if (response.status === 502) {
+          console.error("❌ Error 502 - Bad Gateway");
+          $("#unauthorized-error").text("Error del servidor (502). Intente nuevamente.");
+          setTimeout(() => {
+            $("#unauthorized-error").text("");
+          }, 5000);
+          return;
+        }
+        
+        if (response.status === 422) {
+          response.body.errors.forEach((error) => {
+            if (error.path === "code") {
+              $("#code-error").text(error.msg);
+            }
+          });
+          setTimeout(() => {
+            $("#code-error").text("");
+          }, 2000);
+          return;
+        }
+        
+        if (response.status === 200) {
+          console.log("Código verificado, redirigiendo...");
+          window.location.href = response.body.redirect;
+          return;
+        }
+        
+        if (response.status === 401) {
+          console.log("Error de autorización:", response.body.error);
+          $("#unauthorized-error").text(response.body.error);
+          setTimeout(() => {
+            $("#unauthorized-error").text("");
+          }, 2000);
+          return;
+        }
+        
+        if (response.status === 400) {
+          console.log("Error de parámetros:", response.body.error);
+          $("#unauthorized-error").text(response.body.error);
+          setTimeout(() => {
+            $("#unauthorized-error").text("");
+          }, 2000);
+          return;
+        }
+        
+        // Error genérico
+        console.error("Error inesperado:", response);
+        $("#unauthorized-error").text("Error inesperado. Intente nuevamente.");
         setTimeout(() => {
           $("#unauthorized-error").text("");
-        }, 2000);
+        }, 3000);
+        
+      } catch (error) {
+        console.error("Error en la petición:", error);
+        $("#unauthorized-error").text("Error de conexión. Intente nuevamente.");
+        setTimeout(() => {
+          $("#unauthorized-error").text("");
+        }, 3000);
       }
     } else {
       $inputs.eq(0).focus(); // Regresar el foco al primer input para corrección
