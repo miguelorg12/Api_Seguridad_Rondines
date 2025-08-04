@@ -11,10 +11,19 @@ const app = express();
 // Configurar trust proxy para manejar proxies (importante para producción con HTTPS)
 app.set("trust proxy", 1);
 
+// Configuración de CORS más específica para mantener cookies
 app.use(
   cors({
-    origin: "*",
+    origin: [
+      "https://api-sec-qa.ronditrack.online",
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+    ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
 
@@ -53,6 +62,7 @@ app.use(
       maxAge: 24 * 60 * 60 * 1000, // 24 horas
       sameSite: "lax",
       path: "/",
+      domain: process.env.NODE_ENV === "qa" ? ".ronditrack.online" : undefined,
     },
     name: "oauth_session",
     rolling: true, // Renovar la cookie en cada request
@@ -62,7 +72,11 @@ app.use(
 
 // Middleware de debug para sesiones
 app.use((req, res, next) => {
+  console.log(`🔍 [Session Debug] ${req.method} ${req.path}`);
   console.log(`🔍 [Session Debug] Session ID: ${req.sessionID}`);
+  console.log(
+    `🔍 [Session Debug] Cookie: ${req.headers.cookie ? "present" : "missing"}`
+  );
   if (req.session) {
     console.log(`🔍 [Session Debug] Session data:`, {
       oauthParams: req.session.oauthParams ? "present" : "missing",
