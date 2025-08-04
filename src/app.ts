@@ -39,8 +39,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "default_secret",
-    resave: false,
-    saveUninitialized: true,
+    resave: true,
+    saveUninitialized: false,
+    cookie: {
+      secure: true, // Cambiar a true en producción con HTTPS
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 horas
+      sameSite: "lax",
+    },
+    name: "oauth_session",
   })
 );
 

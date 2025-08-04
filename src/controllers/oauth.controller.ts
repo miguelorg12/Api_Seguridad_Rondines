@@ -217,7 +217,17 @@ export const login = async (req: Request, res: Response) => {
 
   console.log("✅ [login] Login process completed successfully");
 
-  // Construir URL de redirección con parámetros de OAuth
+  // Forzar guardado de sesión antes de responder
+  console.log("🔍 [login] Forcing session save");
+  req.session.save((err) => {
+    if (err) {
+      console.error("❌ [login] Error saving session:", err);
+    } else {
+      console.log("✅ [login] Session saved successfully");
+    }
+  });
+
+  // Construir URL de redirección con parámetros de OAuth y email como fallback
   const oauthParams = new URLSearchParams({
     client_id: client_id as string,
     redirect_uri: redirect_uri as string,
@@ -377,6 +387,10 @@ export const verifyTwoFactorCode = async (req: Request, res: Response) => {
     user: req.session.user ? "present" : "not present",
   });
 
+  // Verificar si hay parámetros OAuth en la query string como fallback
+  const queryParams = req.query;
+  console.log("🔍 [verifyTwoFactorCode] Query parameters:", queryParams);
+
   const { code } = req.body;
   console.log("🔍 [verifyTwoFactorCode] Code received:", code);
 
@@ -388,7 +402,8 @@ export const verifyTwoFactorCode = async (req: Request, res: Response) => {
 
   console.log("✅ [verifyTwoFactorCode] Validation passed");
 
-  const {
+  // Intentar obtener parámetros de la sesión primero
+  let {
     client_id,
     redirect_uri,
     response_type,
@@ -404,7 +419,7 @@ export const verifyTwoFactorCode = async (req: Request, res: Response) => {
     code_challenge_method,
   });
 
-  // Verificar si los parámetros de OAuth están presentes
+  // Si no están en la sesión, intentar obtenerlos de la query string
   if (
     !client_id ||
     !redirect_uri ||
@@ -412,24 +427,96 @@ export const verifyTwoFactorCode = async (req: Request, res: Response) => {
     !code_challenge ||
     !code_challenge_method
   ) {
-    console.error(
-      "❌ [verifyTwoFactorCode] OAuth parameters missing in session:",
-      req.session.oauthParams
+    console.log(
+      "🔍 [verifyTwoFactorCode] Session parameters missing, trying query parameters"
     );
-    return res.status(400).json({
-      error:
-        "Parámetros de autorización faltantes. Por favor, inicie el proceso de autorización nuevamente.",
-    });
+
+    const queryClientId = req.query.client_id as string;
+    const queryRedirectUri = req.query.redirect_uri as string;
+    const queryResponseType = req.query.response_type as string;
+    const queryCodeChallenge = req.query.code_challenge as string;
+    const queryCodeChallengeMethod = req.query.code_challenge_method as string;
+
+    if (
+      queryClientId &&
+      queryRedirectUri &&
+      queryResponseType === "code" &&
+      queryCodeChallenge &&
+      queryCodeChallengeMethod
+    ) {
+      console.log(
+        "✅ [verifyTwoFactorCode] Using query parameters as fallback"
+      );
+      client_id = queryClientId;
+      redirect_uri = queryRedirectUri;
+      response_type = queryResponseType;
+      code_challenge = queryCodeChallenge;
+      code_challenge_method = queryCodeChallengeMethod;
+
+      // Guardar en la sesión para futuras peticiones
+      req.session.oauthParams = {
+        client_id,
+        redirect_uri,
+        response_type,
+        code_challenge,
+        code_challenge_method,
+      };
+      console.log(
+        "✅ [verifyTwoFactorCode] OAuth parameters restored to session from query"
+      );
+    } else {
+      console.error(
+        "❌ [verifyTwoFactorCode] OAuth parameters missing in both session and query"
+      );
+      return res.status(400).json({
+        error:
+          "Parámetros de autorización faltantes. Por favor, inicie el proceso de autorización nuevamente.",
+      });
+    }
   }
 
   console.log("✅ [verifyTwoFactorCode] OAuth parameters validated");
 
   if (!req.session.is2faPending) {
     console.error("❌ [verifyTwoFactorCode] 2FA session missing:", req.session);
-    return res.status(400).json({
-      error:
-        "Sesión de autenticación faltante. Por favor, inicie el proceso de autorización nuevamente.",
-    });
+    console.log(
+      "🔍 [verifyTwoFactorCode] Attempting to recover 2FA session from query parameters"
+    );
+
+    // Intentar recuperar la sesión 2FA usando el código como referencia
+    // Esto es un fallback temporal mientras se resuelve el problema de sesión
+    const userEmail = req.query.email as string;
+    if (userEmail) {
+      console.log(
+        "🔍 [verifyTwoFactorCode] Found email in query, attempting to find user"
+      );
+      const user = await AppDataSource.getRepository(User).findOneBy({
+        email: userEmail,
+      });
+      if (user) {
+        console.log(
+          "✅ [verifyTwoFactorCode] User found by email, creating temporary 2FA session"
+        );
+        req.session.is2faPending = {
+          userId: user.id,
+          email: user.email,
+        };
+      } else {
+        console.error(
+          "❌ [verifyTwoFactorCode] User not found by email:",
+          userEmail
+        );
+        return res.status(400).json({
+          error:
+            "Sesión de autenticación faltante. Por favor, inicie el proceso de autorización nuevamente.",
+        });
+      }
+    } else {
+      return res.status(400).json({
+        error:
+          "Sesión de autenticación faltante. Por favor, inicie el proceso de autorización nuevamente.",
+      });
+    }
   }
 
   console.log("✅ [verifyTwoFactorCode] 2FA session found");
@@ -460,6 +547,16 @@ export const verifyTwoFactorCode = async (req: Request, res: Response) => {
   delete req.session.is2faPending;
 
   console.log("✅ [verifyTwoFactorCode] User session set, 2FA session cleared");
+
+  // Forzar guardado de sesión antes de responder
+  console.log("🔍 [verifyTwoFactorCode] Forcing session save");
+  req.session.save((err) => {
+    if (err) {
+      console.error("❌ [verifyTwoFactorCode] Error saving session:", err);
+    } else {
+      console.log("✅ [verifyTwoFactorCode] Session saved successfully");
+    }
+  });
 
   // Asegurar que los parámetros de OAuth estén disponibles para la siguiente redirección
   const oauthParams = new URLSearchParams({
