@@ -379,243 +379,201 @@ export const token = async (req: Request, res: Response) => {
 };
 
 export const verifyTwoFactorCode = async (req: Request, res: Response) => {
-  try {
+  console.log("🔍 [verifyTwoFactorCode] Iniciando verificación de código 2FA");
+  console.log("🔍 [verifyTwoFactorCode] Session ID:", req.sessionID);
+  console.log("🔍 [verifyTwoFactorCode] Session data:", {
+    oauthParams: req.session.oauthParams,
+    is2faPending: req.session.is2faPending,
+    user: req.session.user ? "present" : "not present",
+  });
+
+  // Verificar si hay parámetros OAuth en la query string como fallback
+  const queryParams = req.query;
+  console.log("🔍 [verifyTwoFactorCode] Query parameters:", queryParams);
+
+  const { code } = req.body;
+  console.log("🔍 [verifyTwoFactorCode] Code received:", code);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log("❌ [verifyTwoFactorCode] Validation errors:", errors.array());
+    return res.status(422).json({ errors: errors.array() });
+  }
+
+  console.log("✅ [verifyTwoFactorCode] Validation passed");
+
+  // Intentar obtener parámetros de la sesión primero
+  let {
+    client_id,
+    redirect_uri,
+    response_type,
+    code_challenge,
+    code_challenge_method,
+  } = req.session.oauthParams || {};
+
+  console.log("🔍 [verifyTwoFactorCode] OAuth parameters from session:", {
+    client_id,
+    redirect_uri,
+    response_type,
+    code_challenge,
+    code_challenge_method,
+  });
+
+  // Si no están en la sesión, intentar obtenerlos de la query string
+  if (
+    !client_id ||
+    !redirect_uri ||
+    response_type !== "code" ||
+    !code_challenge ||
+    !code_challenge_method
+  ) {
     console.log(
-      "🔍 [verifyTwoFactorCode] Iniciando verificación de código 2FA"
+      "🔍 [verifyTwoFactorCode] Session parameters missing, trying query parameters"
     );
-    console.log("🔍 [verifyTwoFactorCode] Session ID:", req.sessionID);
-    console.log("🔍 [verifyTwoFactorCode] Session data:", {
-      oauthParams: req.session.oauthParams,
-      is2faPending: req.session.is2faPending,
-      user: req.session.user ? "present" : "not present",
-    });
 
-    // Verificar si hay parámetros OAuth en la query string como fallback
-    const queryParams = req.query;
-    console.log("🔍 [verifyTwoFactorCode] Query parameters:", queryParams);
+    const queryClientId = req.query.client_id as string;
+    const queryRedirectUri = req.query.redirect_uri as string;
+    const queryResponseType = req.query.response_type as string;
+    const queryCodeChallenge = req.query.code_challenge as string;
+    const queryCodeChallengeMethod = req.query.code_challenge_method as string;
 
-    const { code } = req.body;
-    console.log("🔍 [verifyTwoFactorCode] Code received:", code);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log(
-        "❌ [verifyTwoFactorCode] Validation errors:",
-        errors.array()
-      );
-      return res.status(422).json({ errors: errors.array() });
-    }
-
-    console.log("✅ [verifyTwoFactorCode] Validation passed");
-
-    // Intentar obtener parámetros de la sesión primero
-    let {
-      client_id,
-      redirect_uri,
-      response_type,
-      code_challenge,
-      code_challenge_method,
-    } = req.session.oauthParams || {};
-
-    console.log("🔍 [verifyTwoFactorCode] OAuth parameters from session:", {
-      client_id,
-      redirect_uri,
-      response_type,
-      code_challenge,
-      code_challenge_method,
-    });
-
-    // Si no están en la sesión, intentar obtenerlos de la query string
     if (
-      !client_id ||
-      !redirect_uri ||
-      response_type !== "code" ||
-      !code_challenge ||
-      !code_challenge_method
+      queryClientId &&
+      queryRedirectUri &&
+      queryResponseType === "code" &&
+      queryCodeChallenge &&
+      queryCodeChallengeMethod
     ) {
       console.log(
-        "🔍 [verifyTwoFactorCode] Session parameters missing, trying query parameters"
+        "✅ [verifyTwoFactorCode] Using query parameters as fallback"
       );
+      client_id = queryClientId;
+      redirect_uri = queryRedirectUri;
+      response_type = queryResponseType;
+      code_challenge = queryCodeChallenge;
+      code_challenge_method = queryCodeChallengeMethod;
 
-      const queryClientId = req.query.client_id as string;
-      const queryRedirectUri = req.query.redirect_uri as string;
-      const queryResponseType = req.query.response_type as string;
-      const queryCodeChallenge = req.query.code_challenge as string;
-      const queryCodeChallengeMethod = req.query
-        .code_challenge_method as string;
+      // Guardar en la sesión para futuras peticiones
+      req.session.oauthParams = {
+        client_id,
+        redirect_uri,
+        response_type,
+        code_challenge,
+        code_challenge_method,
+      };
+      console.log(
+        "✅ [verifyTwoFactorCode] OAuth parameters restored to session from query"
+      );
+    } else {
+      console.error(
+        "❌ [verifyTwoFactorCode] OAuth parameters missing in both session and query"
+      );
+      return res.status(400).json({
+        error:
+          "Parámetros de autorización faltantes. Por favor, inicie el proceso de autorización nuevamente.",
+      });
+    }
+  }
 
-      if (
-        queryClientId &&
-        queryRedirectUri &&
-        queryResponseType === "code" &&
-        queryCodeChallenge &&
-        queryCodeChallengeMethod
-      ) {
+  console.log("✅ [verifyTwoFactorCode] OAuth parameters validated");
+
+  if (!req.session.is2faPending) {
+    console.error("❌ [verifyTwoFactorCode] 2FA session missing:", req.session);
+    console.log(
+      "🔍 [verifyTwoFactorCode] Attempting to recover 2FA session from query parameters"
+    );
+
+    // Intentar recuperar la sesión 2FA usando el código como referencia
+    // Esto es un fallback temporal mientras se resuelve el problema de sesión
+    const userEmail = req.query.email as string;
+    if (userEmail) {
+      console.log(
+        "🔍 [verifyTwoFactorCode] Found email in query, attempting to find user"
+      );
+      const user = await AppDataSource.getRepository(User).findOneBy({
+        email: userEmail,
+      });
+      if (user) {
         console.log(
-          "✅ [verifyTwoFactorCode] Using query parameters as fallback"
+          "✅ [verifyTwoFactorCode] User found by email, creating temporary 2FA session"
         );
-        client_id = queryClientId;
-        redirect_uri = queryRedirectUri;
-        response_type = queryResponseType;
-        code_challenge = queryCodeChallenge;
-        code_challenge_method = queryCodeChallengeMethod;
-
-        // Guardar en la sesión para futuras peticiones
-        req.session.oauthParams = {
-          client_id,
-          redirect_uri,
-          response_type,
-          code_challenge,
-          code_challenge_method,
+        req.session.is2faPending = {
+          userId: user.id,
+          email: user.email,
         };
-        console.log(
-          "✅ [verifyTwoFactorCode] OAuth parameters restored to session from query"
-        );
       } else {
         console.error(
-          "❌ [verifyTwoFactorCode] OAuth parameters missing in both session and query"
+          "❌ [verifyTwoFactorCode] User not found by email:",
+          userEmail
         );
-        return res.status(400).json({
-          error:
-            "Parámetros de autorización faltantes. Por favor, inicie el proceso de autorización nuevamente.",
-        });
-      }
-    }
-
-    console.log("✅ [verifyTwoFactorCode] OAuth parameters validated");
-
-    if (!req.session.is2faPending) {
-      console.error(
-        "❌ [verifyTwoFactorCode] 2FA session missing:",
-        req.session
-      );
-      console.log(
-        "🔍 [verifyTwoFactorCode] Attempting to recover 2FA session from query parameters"
-      );
-
-      // Intentar recuperar la sesión 2FA usando el código como referencia
-      // Esto es un fallback temporal mientras se resuelve el problema de sesión
-      const userEmail = req.query.email as string;
-      if (userEmail) {
-        console.log(
-          "🔍 [verifyTwoFactorCode] Found email in query, attempting to find user"
-        );
-        const user = await AppDataSource.getRepository(User).findOneBy({
-          email: userEmail,
-        });
-        if (user) {
-          console.log(
-            "✅ [verifyTwoFactorCode] User found by email, creating temporary 2FA session"
-          );
-          req.session.is2faPending = {
-            userId: user.id,
-            email: user.email,
-          };
-        } else {
-          console.error(
-            "❌ [verifyTwoFactorCode] User not found by email:",
-            userEmail
-          );
-          return res.status(400).json({
-            error:
-              "Sesión de autenticación faltante. Por favor, inicie el proceso de autorización nuevamente.",
-          });
-        }
-      } else {
         return res.status(400).json({
           error:
             "Sesión de autenticación faltante. Por favor, inicie el proceso de autorización nuevamente.",
         });
       }
-    }
-
-    console.log("✅ [verifyTwoFactorCode] 2FA session found");
-
-    const { userId, email } = req.session.is2faPending;
-    console.log("🔍 [verifyTwoFactorCode] Verifying 2FA code for user:", {
-      userId,
-      email,
-    });
-
-    const isValid = await oauthService.verifyTwoFactorCode(userId, code);
-    console.log("🔍 [verifyTwoFactorCode] 2FA verification result:", {
-      email,
-      isValid,
-    });
-
-    if (!isValid) {
-      console.log("❌ [verifyTwoFactorCode] Invalid 2FA code for user:", email);
-      return res.status(401).json({ error: "Codigo incorrecto" });
-    }
-
-    console.log("✅ [verifyTwoFactorCode] 2FA code verified successfully");
-
-    console.log("🔍 [verifyTwoFactorCode] Setting user in session");
-    req.session.user = await AppDataSource.getRepository(User).findOneBy({
-      id: userId,
-    });
-    delete req.session.is2faPending;
-
-    console.log(
-      "✅ [verifyTwoFactorCode] User session set, 2FA session cleared"
-    );
-
-    // Forzar guardado de sesión antes de responder
-    console.log("🔍 [verifyTwoFactorCode] Forcing session save");
-    req.session.save((err) => {
-      if (err) {
-        console.error("❌ [verifyTwoFactorCode] Error saving session:", err);
-      } else {
-        console.log("✅ [verifyTwoFactorCode] Session saved successfully");
-      }
-    });
-
-    // Asegurar que los parámetros de OAuth estén disponibles para la siguiente redirección
-    const oauthParams = new URLSearchParams({
-      client_id: client_id as string,
-      redirect_uri: redirect_uri as string,
-      response_type: response_type as string,
-      code_challenge: code_challenge as string,
-      code_challenge_method: code_challenge_method as string,
-    });
-
-    const redirectUrl = `/oauth/v1/authorize?${oauthParams.toString()}`;
-    console.log("🔍 [verifyTwoFactorCode] Redirecting to:", redirectUrl);
-
-    return res.json({
-      success: true,
-      redirect: redirectUrl,
-    });
-  } catch (error) {
-    console.error("❌ [verifyTwoFactorCode] Unhandled error:", error);
-    console.error(
-      "❌ [verifyTwoFactorCode] Error stack:",
-      error instanceof Error ? error.stack : "No stack trace"
-    );
-    console.error(
-      "❌ [verifyTwoFactorCode] Error type:",
-      error instanceof Error ? error.constructor.name : "Unknown"
-    );
-
-    // Si es un error de base de datos
-    if (error instanceof Error && error.message.includes("ECONNREFUSED")) {
-      return res.status(500).json({
-        error: "Error de conexión a la base de datos",
-        details:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+    } else {
+      return res.status(400).json({
+        error:
+          "Sesión de autenticación faltante. Por favor, inicie el proceso de autorización nuevamente.",
       });
     }
-
-    return res.status(500).json({
-      error: "Error interno del servidor",
-      details:
-        process.env.NODE_ENV === "development"
-          ? error instanceof Error
-            ? error.message
-            : "Unknown error"
-          : undefined,
-    });
   }
+
+  console.log("✅ [verifyTwoFactorCode] 2FA session found");
+
+  const { userId, email } = req.session.is2faPending;
+  console.log("🔍 [verifyTwoFactorCode] Verifying 2FA code for user:", {
+    userId,
+    email,
+  });
+
+  const isValid = await oauthService.verifyTwoFactorCode(userId, code);
+  console.log("🔍 [verifyTwoFactorCode] 2FA verification result:", {
+    email,
+    isValid,
+  });
+
+  if (!isValid) {
+    console.log("❌ [verifyTwoFactorCode] Invalid 2FA code for user:", email);
+    return res.status(401).json({ error: "Codigo incorrecto" });
+  }
+
+  console.log("✅ [verifyTwoFactorCode] 2FA code verified successfully");
+
+  console.log("🔍 [verifyTwoFactorCode] Setting user in session");
+  req.session.user = await AppDataSource.getRepository(User).findOneBy({
+    id: userId,
+  });
+  delete req.session.is2faPending;
+
+  console.log("✅ [verifyTwoFactorCode] User session set, 2FA session cleared");
+
+  // Forzar guardado de sesión antes de responder
+  console.log("🔍 [verifyTwoFactorCode] Forcing session save");
+  req.session.save((err) => {
+    if (err) {
+      console.error("❌ [verifyTwoFactorCode] Error saving session:", err);
+    } else {
+      console.log("✅ [verifyTwoFactorCode] Session saved successfully");
+    }
+  });
+
+  // Asegurar que los parámetros de OAuth estén disponibles para la siguiente redirección
+  const oauthParams = new URLSearchParams({
+    client_id: client_id as string,
+    redirect_uri: redirect_uri as string,
+    response_type: response_type as string,
+    code_challenge: code_challenge as string,
+    code_challenge_method: code_challenge_method as string,
+  });
+
+  const redirectUrl = `/oauth/v1/authorize?${oauthParams.toString()}`;
+  console.log("🔍 [verifyTwoFactorCode] Redirecting to:", redirectUrl);
+
+  return res.json({
+    success: true,
+    redirect: redirectUrl,
+  });
 };
 
 export const getMe = async (req: Request, res: Response) => {
