@@ -72,15 +72,15 @@
     "typescript": "^5.8.3"
   },
   "_moduleAliases": {
-    "@controllers": "src/controllers",
-    "@interfaces": "src/interfaces",
-    "@services": "src/services",
-    "@utils": "src/utils",
-    "@configs": "src/configs",
-    "@routes": "src/routes",
-    "@validators": "src/utils/validators",
-    "@entities": "src/interfaces/entity",
-    "@dto": "src/interfaces/dto"
+    "@controllers": "dist/controllers",
+    "@interfaces": "dist/interfaces",
+    "@services": "dist/services",
+    "@utils": "dist/utils",
+    "@configs": "dist/configs",
+    "@routes": "dist/routes",
+    "@validators": "dist/utils/validators",
+    "@entities": "dist/interfaces/entity",
+    "@dto": "dist/interfaces/dto"
   },
   "engines": {
     "node": ">=18.0.0",

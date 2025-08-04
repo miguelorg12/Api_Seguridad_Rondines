@@ -1,27 +1,7 @@
 import "reflect-metadata";
 
-// Configurar module-alias según el entorno
-const isCompiled = __dirname.includes("dist");
-if (isCompiled) {
-  // En producción, configurar los alias directamente
-  const moduleAlias = require("module-alias");
-  const path = require("path");
-
-  moduleAlias.addAliases({
-    "@controllers": path.join(__dirname, "controllers"),
-    "@interfaces": path.join(__dirname, "interfaces"),
-    "@services": path.join(__dirname, "services"),
-    "@utils": path.join(__dirname, "utils"),
-    "@configs": path.join(__dirname, "configs"),
-    "@routes": path.join(__dirname, "routes"),
-    "@validators": path.join(__dirname, "utils/validators"),
-    "@entities": path.join(__dirname, "interfaces/entity"),
-    "@dto": path.join(__dirname, "interfaces/dto"),
-  });
-} else {
-  // En desarrollo, usar la configuración normal
-  require("module-alias/register");
-}
+// Configurar module-alias
+require("module-alias/register");
 
 // Cargar el archivo de entorno correcto según NODE_ENV
 const envFile =
