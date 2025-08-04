@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: 'api-seguridad-rondines',
+    name: 'api-sec-qa',
     script: 'dist/server.js',
     instances: 'max',
     exec_mode: 'cluster',
@@ -24,6 +24,8 @@ module.exports = {
     autorestart: true,
     watch: false,
     max_memory_restart: '1G',
-    node_args: '--max-old-space-size=1024'
+    node_args: '--max-old-space-size=1024',
+    log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+    merge_logs: true
   }]
 }; 
