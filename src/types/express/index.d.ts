@@ -3,6 +3,7 @@ import "express-session";
 declare module "express-session" {
   interface SessionData {
     user?: any;
+    testCount?: number;
   }
   interface Session {
     oauthParams?: {
@@ -16,5 +17,6 @@ declare module "express-session" {
       userId: number;
       email: string;
     };
+    testCount?: number;
   }
 }

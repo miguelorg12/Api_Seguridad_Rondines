@@ -8,6 +8,9 @@ import oauthApiRoutes from "./routes/api/oauth.route";
 
 const app = express();
 
+// Configurar trust proxy para HTTPS y reverse proxy
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: "*",
@@ -41,25 +44,69 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "default_secret",
-    resave: true,
+    resave: false, // Cambiado a false para mejor rendimiento
     saveUninitialized: false,
     cookie: {
-      secure: true, // Habilitado para HTTPS
+      secure: process.env.NODE_ENV === "production", // Solo true en producción con HTTPS
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 horas
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       path: "/",
     },
     name: "oauth_session",
     rolling: true, // Renovar la cookie en cada request
     unset: "destroy", // Destruir la sesión al cerrar el navegador
+    // Configuración adicional para producción
+    proxy: process.env.NODE_ENV === "production", // Confiar en el proxy en producción
   })
 );
+
+// Middleware de debug para sesiones
+app.use((req, res, next) => {
+  console.log("🔍 [Session Debug] Request URL:", req.url);
+  console.log("🔍 [Session Debug] Session ID:", req.sessionID);
+  console.log("🔍 [Session Debug] Session exists:", !!req.session);
+  console.log("🔍 [Session Debug] Session data:", {
+    oauthParams: req.session?.oauthParams ? "present" : "not present",
+    is2faPending: req.session?.is2faPending ? "present" : "not present",
+    user: req.session?.user ? "present" : "not present",
+  });
+  console.log("🔍 [Session Debug] Headers:", {
+    cookie: req.headers.cookie ? "present" : "not present",
+    "x-forwarded-proto": req.headers["x-forwarded-proto"],
+    "x-forwarded-for": req.headers["x-forwarded-for"],
+  });
+  next();
+});
 
 app.use("/oauth/v1", oauthApiRoutes);
 
 app.get("/", (req, res) => {
   res.json("Hello, World!");
+});
+
+// Endpoint de prueba para sesiones
+app.get("/test-session", (req, res) => {
+  if (!req.session.testCount) {
+    req.session.testCount = 0;
+  }
+  req.session.testCount++;
+
+  res.json({
+    sessionId: req.sessionID,
+    testCount: req.session.testCount,
+    sessionExists: !!req.session,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Endpoint para limpiar sesión de prueba
+app.get("/clear-test-session", (req, res) => {
+  delete req.session.testCount;
+  res.json({
+    message: "Test session cleared",
+    sessionId: req.sessionID,
+  });
 });
 
 export default app;
