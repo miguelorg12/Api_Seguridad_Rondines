@@ -6,7 +6,7 @@ import path from "path";
 import cors from "cors";
 
 import oauthApiRoutes from "./routes/api/oauth.route";
-const dbUrl = `postgres://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@localhost:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
+const dbUrl = `postgres://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
 const app = express();
 app.use(
   cors({
