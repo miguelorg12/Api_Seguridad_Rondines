@@ -14,9 +14,20 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.static(path.join(__dirname, "..", "public")));
+
+// Serve static files
+const isProduction = process.env.NODE_ENV === "production";
+const staticPath = isProduction
+  ? path.join(__dirname, "..", "public")
+  : path.join(__dirname, "..", "public");
+app.use(express.static(staticPath));
+
+// Set view engine
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+const viewsPath = isProduction
+  ? path.join(__dirname, "views")
+  : path.join(__dirname, "views");
+app.set("views", viewsPath);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
