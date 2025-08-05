@@ -9,7 +9,6 @@ import { PatrolAssignment } from "@interfaces/entity/patrol_assigment.entity";
 import { Checkpoint } from "@entities/checkpoint.entity";
 import { CheckpointRecord } from "@entities/checkpoint_record.entity";
 import { Incident } from "@entities/incident.entity";
-import { Plan } from "@entities/plan.entity";
 import { Shift } from "@entities/shift.entity";
 import { Role } from "@entities/role.entity";
 import { ReportLog } from "@entities/report_log.entity";
@@ -19,6 +18,7 @@ import { OauthAccessTokensEntity } from "@entities/oauth_access_tokens.entity";
 import { OauthClientsEntity } from "@entities/oauth_clients.entity";
 import { Code } from "@entities/code.entity";
 import { IncidentImage } from "@interfaces/entity/incident_image.entity";
+import { PatrolRoutePoint } from "@entities/patrol_route_point.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -39,7 +39,6 @@ export const AppDataSource = new DataSource({
     Checkpoint,
     CheckpointRecord,
     Incident,
-    Plan,
     Shift,
     Role,
     ReportLog,
@@ -49,6 +48,7 @@ export const AppDataSource = new DataSource({
     OauthClientsEntity,
     Code,
     IncidentImage,
+    PatrolRoutePoint,
   ],
   subscribers: [],
   migrations: [__dirname + "/../utils/migrations/*.{ts,js}"],

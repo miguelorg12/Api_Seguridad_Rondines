@@ -248,33 +248,36 @@ export const getMe = async (req: Request, res: Response) => {
     console.log("JWT decoded:", decode);
     const user = await AppDataSource.getRepository(User).findOne({
       where: { id: Number(decode.sub) },
-      relations: ["role", "branch", "branches"],
-      select: {
-        id: true,
-        name: true,
-        last_name: true,
-        curp: true,
-        email: true,
-        active: true,
-        role: {
-          id: true,
-          name: true,
-        },
-        branch: {
-          id: true,
-          name: true,
-          address: true,
-        },
-        branches: {
-          id: true,
-          name: true,
-          address: true,
-        },
-      },
+      relations: [
+        "role",
+        "branch",
+        "branches",
+        "patrolAssignments",
+        "patrolAssignments.patrol",
+        "patrolAssignments.shift",
+      ],
     });
+
+    // Filtrar el patrol assignment actual (que coincida con la fecha de hoy)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentPatrolAssignment = user?.patrolAssignments?.find(
+      (assignment) => {
+        const assignmentDate = new Date(assignment.date);
+        assignmentDate.setHours(0, 0, 0, 0);
+        return assignmentDate.getTime() === today.getTime();
+      }
+    );
+
+    // Crear el objeto de respuesta con el patrol assignment actual
+    const userResponse = {
+      ...user,
+      currentPatrolAssignment: currentPatrolAssignment || null,
+    };
     return res.json({
       success: true,
-      user: user,
+      user: userResponse,
     });
   } catch (error) {
     console.error("JWT verification error:", error);

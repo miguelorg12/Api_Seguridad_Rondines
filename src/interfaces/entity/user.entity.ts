@@ -1,6 +1,7 @@
 import {
   AfterInsert,
   BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -23,6 +24,7 @@ import { OauthAuthorizationCodesEntity } from "@entities/oauth_authorization_cod
 import { OauthAccessTokensEntity } from "@entities/oauth_access_tokens.entity";
 import { OauthRefreshTokensEntity } from "@entities/oauth_refresh_tokens.entity";
 import { Code } from "@entities/code.entity";
+import { PatrolAssignment } from "@entities/patrol_assigment.entity";
 
 @Entity("users")
 export class User {
@@ -82,6 +84,9 @@ export class User {
   @OneToMany(() => OauthAccessTokensEntity, (accessToken) => accessToken.user)
   accessTokens: OauthAccessTokensEntity[];
 
+  @OneToMany(() => PatrolAssignment, (patrolAssignment) => patrolAssignment.user)
+  patrolAssignments: PatrolAssignment[];
+
   @ManyToMany(() => Branch, (branch) => branch.guards)
   @JoinTable({
     name: "user_branches",
@@ -101,6 +106,13 @@ export class User {
 
   @BeforeInsert()
   async hashPassword() {
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+  }
+
+  @BeforeUpdate()
+  async hashPasswordOnUpdate() {
     if (this.password) {
       this.password = await bcrypt.hash(this.password, 10);
     }

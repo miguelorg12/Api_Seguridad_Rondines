@@ -32,7 +32,7 @@ export class Incident {
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @ManyToOne(() => Checkpoint, (checkpoint) => checkpoint.incident, {
+  @ManyToOne(() => Checkpoint, (checkpoint) => checkpoint.incidents, {
     onDelete: "CASCADE",
     nullable: true,
   })
