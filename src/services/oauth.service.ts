@@ -213,7 +213,7 @@ export class OauthService {
   }
   async generateCodeTwoFactor(user_id: number) {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-
+    console.log("Code generated:", code);
     const user = await this.userRepository.findOne({ where: { id: user_id } });
     if (!user) throw new Error("User not found");
 
