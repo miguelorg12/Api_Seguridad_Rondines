@@ -159,14 +159,15 @@ export class OauthService {
       sub: authCode.user.id,
       client_id: authCode.client.client_id,
     };
-    const expiresIn = 3600; // 1 hour
-    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn });
+    // Token que nunca expira (para desarrollo/testing)
+    // En producción, considera usar un tiempo de expiración largo
+    const accessToken = jwt.sign(payload, JWT_SECRET);
 
     await this.accessTokenRepository.save({
       access_token: accessToken,
       user: { id: authCode.user.id },
       client: { id: authCode.client.id },
-      expires_at: new Date(Date.now() + expiresIn * 1000), // expiresIn = 3600 segundos = 1 hora
+      expires_at: undefined, // Token no expira
     });
 
     const user = await this.userRepository.findOne({
@@ -207,7 +208,7 @@ export class OauthService {
     return {
       accessToken,
       tojenType: "Bearer",
-      expires_in: expiresIn,
+      expires_in: null, // Token no expira
       user: mappedUser,
     };
   }
