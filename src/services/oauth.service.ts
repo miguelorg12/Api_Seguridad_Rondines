@@ -163,12 +163,12 @@ export class OauthService {
     // En producción, considera usar un tiempo de expiración largo
     const accessToken = jwt.sign(payload, JWT_SECRET);
 
-    await this.accessTokenRepository.save({
-      access_token: accessToken,
-      user: { id: authCode.user.id },
-      client: { id: authCode.client.id },
-      expires_at: undefined, // Token no expira
-    });
+    // await this.accessTokenRepository.save({
+    //   access_token: accessToken,
+    //   user: { id: authCode.user.id },
+    //   client: { id: authCode.client.id },
+    //   expires_at: undefined, // Token no expira
+    // });
 
     const user = await this.userRepository.findOne({
       where: { id: authCode.user.id },
