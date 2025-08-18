@@ -208,7 +208,7 @@ export class OauthService {
     return {
       accessToken,
       tojenType: "Bearer",
-      expires_in: null, // Token no expira
+      expires_in: 900000, // Token no expira
       user: mappedUser,
     };
   }
